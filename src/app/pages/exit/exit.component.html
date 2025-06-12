@@ -1,0 +1,75 @@
+<div class="container">
+  <div class="row">
+    <div class="col s12">
+      <h3 class="center-align">Salida de Productos del Inventario</h3>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col s12 m8 offset-m2">
+      <div class="card-panel z-depth-1">
+        <div class="row">
+          <div class="input-field col s12">
+            <form [formGroup]="searchForm" (ngSubmit)="searchProduct()">
+              <input id="search_query" type="text" formControlName="searchQuery" class="validate">
+              <label for="search_query">Buscar por Código de Barras, Nombre o Factura</label>
+              <span class="helper-text red-text" *ngIf="searchForm.get('searchQuery')?.invalid && searchForm.get('searchQuery')?.touched">Ingrese un término de búsqueda</span>
+            </form>
+            <button class="btn waves-effect waves-light blue right" (click)="searchProduct()">
+              Buscar Producto <i class="material-icons right">search</i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="foundProduct">
+    <div class="col s12 m8 offset-m2">
+      <div class="card-panel z-depth-1">
+        <h5>Detalles del Producto: {{ foundProduct.name }}</h5>
+        <div class="row">
+          <div class="col s12 m6">
+            <strong>Código de Barras:</strong> {{ foundProduct.code }} <br>
+            <strong>Orden de Donación:</strong> {{ foundProduct.invoice_number }} <br>
+            <strong>Proveedor:</strong> {{ getProviderName(foundProduct.id_provider) }} <br>
+            <strong>Fecha de Vencimiento:</strong> {{ foundProduct.expiration_date }} <br>
+            <strong>Categoría:</strong> {{ getCategoryName(foundProduct.id_category) }} <br>
+          </div>
+          <div class="col s12 m6">
+            <strong>Subcategoría:</strong> {{ getSubcategoryName(foundProduct.id_subcategory) }} <br>
+            <strong>Lote:</strong> {{ foundProduct.lot }} <br>
+            <strong>Unidad:</strong> {{ foundProduct.unit }} <br>
+            <strong>Peso Total:</strong> {{ foundProduct.total_weight }} <br>
+            <strong>Cantidad Disponible:</strong> <span class="badge new red" data-badge-caption="unidades">{{ foundProduct.quantity }}</span> <br>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <form [formGroup]="exitForm" (ngSubmit)="exitProduct()" class="row">
+          <div class="input-field col s12 m6">
+            <input id="quantityToExit" type="number" formControlName="quantityToExit" class="validate" min="1">
+            <label for="quantityToExit">Cantidad a Salir</label>
+            <span class="helper-text red-text" *ngIf="exitForm.get('quantityToExit')?.invalid && exitForm.get('quantityToExit')?.touched">
+              Cantidad requerida y debe ser al menos 1
+            </span>
+          </div>
+          <div class="col s12 m6 right-align">
+            <button class="btn waves-effect waves-light red darken-1" type="submit" name="action">
+              Registrar Salida <i class="material-icons right">remove_shopping_cart</i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="!foundProduct && searchForm.get('searchQuery')?.value && searchForm.get('searchQuery')?.touched">
+    <div class="col s12 m8 offset-m2">
+      <div class="card-panel yellow lighten-4 black-text">
+        <p class="center-align">No se encontró ningún producto con el término de búsqueda.</p>
+      </div>
+    </div>
+  </div>
+</div>

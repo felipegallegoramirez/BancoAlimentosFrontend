@@ -1,0 +1,76 @@
+/* inventory.component.css */
+/* Basic styling for better readability if needed */
+.container {
+  margin-top: 20px;
+}
+
+.card-panel {
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+.btn-small {
+  margin: 0 4px;
+}
+
+.active-row {
+  background-color: #e3f2fd !important; /* Light blue for selected row */
+  cursor: pointer;
+}
+
+.product-details-expanded {
+  background-color: #f8f8f8;
+  border-left: 5px solid #2196f3; /* Blue border for details */
+  padding: 15px !important;
+}
+
+.product-details-expanded h6 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.product-details-expanded p {
+  margin: 5px 0;
+}
+
+/* Materialize overrides if necessary, or just rely on default */
+.input-field label.active {
+  transform: translateY(-14px) scale(0.8);
+  transform-origin: 0 0;
+}
+.input-field input[type=date]:focus + label,
+.input-field input[type=text]:focus + label,
+.input-field input[type=number]:focus + label,
+.input-field textarea:focus + label {
+  color: #2196f3; /* Adjust focus color */
+}
+
+.input-field input[type=date]:focus,
+.input-field input[type=text]:focus,
+.input-field input[type=number]:focus,
+.input-field textarea:focus {
+  border-bottom: 1px solid #2196f3;
+  box-shadow: 0 1px 0 0 #2196f3;
+}
+
+/* Style for select dropdowns to ensure they are visible when populated */
+.select-wrapper input.select-dropdown {
+  color: #424242; /* Default text color */
+}

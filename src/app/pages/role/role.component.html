@@ -1,0 +1,112 @@
+<div class="container">
+    <div class="row">
+      <div class="col s12">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Gestión de Roles</span>
+  
+            <a class="waves-effect waves-light btn-small right" (click)="addRole()">
+              <i class="material-icons left">add</i>Agregar Rol
+            </a>
+  
+            <table class="striped highlight responsive-table">
+              <thead>
+                <tr>
+                  <th>Nombre del Rol</th>
+                  <th>Fecha de Creación</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let role of roles">
+                  <td>{{ role.name }}</td>
+                  <td>{{ role.created_at | date:'short' }}</td>
+                  <td>
+                    <a class="waves-effect waves-light btn-small green darken-1" (click)="selectRole(role)">
+                      <i class="material-icons">visibility</i>
+                    </a>
+                    <a class="waves-effect waves-light btn-small blue darken-1" (click)="editRole(role)">
+                      <i class="material-icons">edit</i>
+                    </a>
+                    <a class="waves-effect waves-light btn-small red darken-1" (click)="deleteRole(role.id_role)">
+                      <i class="material-icons">delete</i>
+                    </a>
+                  </td>
+                </tr>
+                <tr *ngIf="roles.length === 0">
+                  <td colspan="3" class="center-align">No hay roles disponibles.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="row" *ngIf="selectedRole || showForm">
+      <div class="col s12">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              {{ isEditing ? 'Editar Rol' : (showForm && !isEditing ? 'Agregar Nuevo Rol' : 'Detalles del Rol') }}
+            </span>
+  
+            <div *ngIf="selectedRole && !showForm">
+              <p><strong>ID del Rol:</strong> {{ selectedRole.id_role }}</p>
+              <p><strong>Nombre:</strong> {{ selectedRole.name }}</p>
+              <p><strong>Creado el:</strong> {{ selectedRole.created_at | date:'medium' }}</p>
+              <p><strong>Última Actualización:</strong> {{ selectedRole.updated_at | date:'medium' }}</p>
+  
+              <h5>Permisos:</h5>
+              <ul *ngIf="selectedRole.permissions && selectedRole.permissions.length > 0; else noPermissions">
+                <li *ngFor="let perm of selectedRole.permissions">
+                  - {{ perm.name }}
+                </li>
+              </ul>
+              <ng-template #noPermissions>
+                <p>Este rol no tiene permisos asignados.</p>
+              </ng-template>
+              <div class="card-action">
+                <a class="waves-effect waves-light btn-small grey darken-1" (click)="cancel()">Cerrar</a>
+                <a class="waves-effect waves-light btn-small blue darken-1 right" (click)="editRole(selectedRole)">
+                  <i class="material-icons left">edit</i>Editar
+                </a>
+              </div>
+            </div>
+  
+            <div *ngIf="showForm">
+              <form #roleForm="ngForm" (ngSubmit)="saveRole()">
+                <div class="input-field">
+                  <input id="role_name" type="text" [(ngModel)]="newRole!.name" name="name" required>
+                  <label for="role_name" [class.active]="newRole!.name">Nombre del Rol</label>
+                </div>
+  
+                <h5>Asignar Permisos:</h5>
+                <div class="row">
+                  <div class="col s12 m6 l4" *ngFor="let perm of permissions">
+                    <p>
+                      <label>
+                        <input type="checkbox"
+                               [checked]="isPermissionAssigned(perm.id_permission)"
+                               (change)="togglePermission(perm)" />
+                        <span>{{ perm.name }}</span>
+                      </label>
+                    </p>
+                  </div>
+                </div>
+  
+                <div class="card-action">
+                  <button type="submit" class="waves-effect waves-light btn blue darken-1">
+                    <i class="material-icons left">save</i>Guardar
+                  </button>
+                  <button type="button" class="waves-effect waves-light btn grey darken-1" (click)="cancel()">
+                    <i class="material-icons left">cancel</i>Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

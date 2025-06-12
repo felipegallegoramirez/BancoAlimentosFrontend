@@ -1,0 +1,32 @@
+/* src/app/exit/exit.component.css */
+.container {
+  margin-top: 20px;
+}
+
+.card {
+  padding: 10px;
+}
+
+.ml-2 {
+  margin-left: 1rem !important;
+}
+
+/* Ensure Materialize select and textarea labels work correctly with Angular */
+.input-field label {
+  pointer-events: none; /* Prevents label from interfering with select click */
+}
+.input-field.col label {
+  width: 100%;
+}
+.input-field textarea.materialize-textarea:focus + label {
+  color: #2196F3 !important;
+}
+.input-field textarea.materialize-textarea:focus {
+  border-bottom: 1px solid #2196F3 !important;
+  box-shadow: 0 1px 0 0 #2196F3 !important;
+}
+
+/* Style for displaying selected product details */
+.card-content p {
+  margin-bottom: 5px;
+}

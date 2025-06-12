@@ -1,0 +1,174 @@
+<div class="container">
+  <div class="row">
+    <div class="col s12">
+      <h3 class="center-align">Gestión de Reportes</h3>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col s12 m6">
+      <div class="input-field">
+        <i class="material-icons prefix">search</i>
+        <input id="search_term" type="text" [(ngModel)]="searchTerm" (input)="applyFilters()">
+        <label for="search_term">Búsqueda Rápida</label>
+      </div>
+    </div>
+    <div class="col s12 m6 right-align">
+      <a class="waves-effect waves-light btn modal-trigger blue darken-1" (click)="openAddModal()">
+        <i class="material-icons left">add</i>Añadir Reporte
+      </a>
+      <a class="waves-effect waves-light btn grey lighten-1 ml-10" (click)="toggleAdvancedFilter()">
+        <i class="material-icons left">filter_list</i>Filtro Avanzado
+      </a>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="showAdvancedFilter">
+    <div class="col s12 card-panel grey lighten-4 z-depth-1">
+      <h5 class="center-align">Filtros Avanzados</h5>
+      <div class="row">
+        <div class="input-field col s12 m6 l3">
+          <input id="advanced_report_date_start" type="text" class="datepicker" [(ngModel)]="advancedFilters.report_date_start" (change)="applyFilters()">
+          <label for="advanced_report_date_start">Fecha de Reporte (Desde)</label>
+        </div>
+        <div class="input-field col s12 m6 l3">
+          <input id="advanced_report_date_end" type="text" class="datepicker" [(ngModel)]="advancedFilters.report_date_end" (change)="applyFilters()">
+          <label for="advanced_report_date_end">Fecha de Reporte (Hasta)</label>
+        </div>
+        <div class="input-field col s12 m6 l3">
+          <input id="advanced_made_by" type="text" [(ngModel)]="advancedFilters.made_by" (input)="applyFilters()">
+          <label for="advanced_made_by">Realizado Por</label>
+        </div>
+        <div class="input-field col s12 m6 l3">
+          <input id="advanced_comment" type="text" [(ngModel)]="advancedFilters.comment" (input)="applyFilters()">
+          <label for="advanced_comment">Comentario (Búsqueda)</label>
+        </div>
+      </div>
+      <div class="row center-align">
+        <a class="waves-effect waves-light btn blue darken-1" (click)="applyFilters()">
+          <i class="material-icons left">check</i>Aplicar Filtro
+        </a>
+        <a class="waves-effect waves-light btn orange darken-1 ml-10" (click)="resetAdvancedFilter()">
+          <i class="material-icons left">refresh</i>Resetear Filtros
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col s12">
+      <table class="striped responsive-table">
+        <thead>
+          <tr>
+            <th>Fecha Reporte</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Realizado Por</th>
+            <th>Comentario</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredReports.length === 0">
+            <td colspan="6" class="center-align">No hay reportes para mostrar.</td>
+          </tr>
+          <tr *ngFor="let report of filteredReports">
+            <td>{{ report.report_date }}</td>
+            <td>{{ report.start_date }}</td>
+            <td>{{ report.end_date }}</td>
+            <td>{{ report.made_by }}</td>
+            <td>{{ report.comment.substring(0, 50) }}{{ report.comment.length > 50 ? '...' : '' }}</td>
+            <td>
+              <a class="btn-floating waves-effect waves-light blue tooltipped" data-position="bottom" data-tooltip="Ver Detalles"
+                (click)="openDetailModal(report)">
+                <i class="material-icons">visibility</i>
+              </a>
+              <a class="btn-floating waves-effect waves-light green tooltipped ml-5" data-position="bottom" data-tooltip="Editar"
+                (click)="openEditModal(report)">
+                <i class="material-icons">edit</i>
+              </a>
+              <a class="btn-floating waves-effect waves-light red tooltipped ml-5" data-position="bottom" data-tooltip="Eliminar"
+                (click)="deleteReport(report.id_report)">
+                <i class="material-icons">delete</i>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="addEditReportModal" class="modal">
+    <div class="modal-content">
+      <h4>{{ selectedReport ? 'Editar Reporte' : 'Añadir Nuevo Reporte' }}</h4>
+      <form [formGroup]="reportForm">
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <input id="report_date" type="text" class="datepicker" formControlName="report_date" required>
+            <label for="report_date" [class.active]="reportForm.get('report_date')?.value">Fecha de Reporte</label>
+            <div *ngIf="reportForm.get('report_date')?.invalid && reportForm.get('report_date')?.touched" class="red-text">
+              Campo requerido.
+            </div>
+          </div>
+          <div class="input-field col s12 m6">
+            <input id="start_date" type="text" class="datepicker" formControlName="start_date" required>
+            <label for="start_date" [class.active]="reportForm.get('start_date')?.value">Fecha de Inicio</label>
+            <div *ngIf="reportForm.get('start_date')?.invalid && reportForm.get('start_date')?.touched" class="red-text">
+              Campo requerido.
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <input id="end_date" type="text" class="datepicker" formControlName="end_date" required>
+            <label for="end_date" [class.active]="reportForm.get('end_date')?.value">Fecha de Fin</label>
+            <div *ngIf="reportForm.get('end_date')?.invalid && reportForm.get('end_date')?.touched" class="red-text">
+              Campo requerido.
+            </div>
+          </div>
+          <div class="input-field col s12 m6">
+            <input id="made_by" type="text" formControlName="made_by" required>
+            <label for="made_by" [class.active]="reportForm.get('made_by')?.value">Realizado Por</label>
+            <div *ngIf="reportForm.get('made_by')?.invalid && reportForm.get('made_by')?.touched" class="red-text">
+              Campo requerido.
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <textarea id="comment" class="materialize-textarea" formControlName="comment" required></textarea>
+            <label for="comment" [class.active]="reportForm.get('comment')?.value">Comentario</label>
+            <div *ngIf="reportForm.get('comment')?.invalid && reportForm.get('comment')?.touched" class="red-text">
+              Campo requerido.
+            </div>
+          </div>
+        </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+      <a class="modal-close waves-effect waves-red btn-flat">Cancelar</a>
+      <button class="btn waves-effect waves-light blue darken-1" (click)="saveReport()" [disabled]="reportForm.invalid">
+        Guardar
+      </button>
+    </div>
+  </div>
+
+  <div id="reportDetailModal" class="modal">
+    <div class="modal-content">
+      <h4>Detalles del Reporte</h4>
+      <div *ngIf="selectedReport">
+        <p><strong>ID Reporte:</strong> {{ selectedReport.id_report }}</p>
+        <p><strong>Fecha Reporte:</strong> {{ selectedReport.report_date }}</p>
+        <p><strong>Fecha Inicio:</strong> {{ selectedReport.start_date }}</p>
+        <p><strong>Fecha Fin:</strong> {{ selectedReport.end_date }}</p>
+        <p><strong>Realizado Por:</strong> {{ selectedReport.made_by }}</p>
+        <p><strong>Comentario:</strong> {{ selectedReport.comment }}</p>
+        <p><strong>Creado En:</strong> {{ selectedReport.created_at }}</p>
+        <p><strong>Actualizado En:</strong> {{ selectedReport.updated_at }}</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a class="modal-close waves-effect waves-green btn-flat">Cerrar</a>
+    </div>
+  </div>
+</div>

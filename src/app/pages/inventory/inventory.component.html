@@ -1,0 +1,236 @@
+<div class="container">
+  <div class="row">
+    <div class="col s12">
+      <h2>Manejo de Inventario</h2>
+      <div class="card">
+        <div class="card-content">
+          <div class="row">
+            <div class="input-field col s12 m6">
+              <i class="material-icons prefix">search</i>
+              <input id="filter" type="text" [(ngModel)]="searchTerm" (keyup)="applyFilter()">
+              <label for="filter">Buscar producto...</label>
+            </div>
+            <div class="col s12 m6 right-align">
+              <a class="waves-effect waves-light btn modal-trigger blue" (click)="openProductModal(null)">
+                <i class="material-icons left">add</i>Agregar Producto
+              </a>
+              <a class="waves-effect waves-light btn green" (click)="toggleAdvancedFilter()">
+                <i class="material-icons left">filter_list</i>Filtro Avanzado
+              </a>
+            </div>
+          </div>
+
+          <div class="row" *ngIf="showAdvancedFilter">
+            <div class="input-field col s12 m4">
+              <select materializeSelect [materializeSelectOptions]="categories" [(ngModel)]="advancedFilter.id_category" (change)="applyAdvancedFilter()">
+                <option value="" disabled selected>Selecciona una Categoría</option>
+                <option *ngFor="let category of categories" [value]="category.id_category">{{ category.name }}</option>
+              </select>
+              <label>Categoría</label>
+            </div>
+            <div class="input-field col s12 m4">
+              <select materializeSelect [materializeSelectOptions]="providers" [(ngModel)]="advancedFilter.id_provider" (change)="applyAdvancedFilter()">
+                <option value="" disabled selected>Selecciona un Proveedor</option>
+                <option *ngFor="let provider of providers" [value]="provider.id_providers">{{ provider.legal_name }}</option>
+              </select>
+              <label>Proveedor</label>
+            </div>
+            <div class="input-field col s12 m4">
+              <input type="date" [(ngModel)]="advancedFilter.entry_date" (change)="applyAdvancedFilter()">
+              <label class="active" for="entry_date">Fecha de Entrada</label>
+            </div>
+             <div class="col s12 right-align">
+              <button class="btn waves-effect waves-light red" (click)="clearAdvancedFilter()">Limpiar Filtros Avanzados</button>
+            </div>
+          </div>
+
+          <table class="highlight responsive-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Unidad</th>
+                <th>Lote</th>
+                <th>Fecha de Entrada</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let product of filteredProducts; let i = index">
+                <tr (click)="toggleDetails(i)" class="clickable-row">
+                  <td>{{ product.name }}</td>
+                  <td>{{ product.quantity }}</td>
+                  <td>{{ product.unit }}</td>
+                  <td>{{ product.lot }}</td>
+                  <td>{{ product.entry_date | date:'shortDate' }}</td>
+                  <td>
+                    <a class="waves-effect waves-light btn-small orange" (click)="openProductModal(product); $event.stopPropagation()">
+                      <i class="material-icons">edit</i>
+                    </a>
+                    <a class="waves-effect waves-light btn-small red darken-1" (click)="deleteProduct(product.id_product); $event.stopPropagation()">
+                      <i class="material-icons">delete</i>
+                    </a>
+                  </td>
+                </tr>
+                <tr *ngIf="expandedProductIndex === i" class="product-details">
+                  <td colspan="6">
+                    <div class="card-panel grey lighten-4 z-depth-1">
+                      <div class="row">
+                        <div class="col s12 m6">
+                          <p><strong>ID Producto:</strong> {{ product.id_product }}</p>
+                          <p><strong>Fecha de Vencimiento:</strong> {{ product.expiration_date | date:'shortDate' }}</p>
+                          <p><strong>Recibido Por:</strong> {{ product.received_by }}</p>
+                          <p><strong>Sede:</strong> {{ product.headquarters }}</p>
+                          <p><strong>Lugar en Inventario:</strong> {{ product.place_in_inventory }}</p>
+                        </div>
+                        <div class="col s12 m6">
+                          <p><strong>Número de Factura:</strong> {{ product.invoice_number }}</p>
+                          <p><strong>Código:</strong> {{ product.code }}</p>
+                          <p><strong>Peso Unitario:</strong> {{ product.unit_weight }}</p>
+                          <p><strong>Peso Total:</strong> {{ product.total_weight }}</p>
+                          <p><strong>Categoría:</strong> {{ getCategoryName(product.id_category) }}</p>
+                          <p><strong>Proveedor:</strong> {{ getProviderName(product.id_provider) }}</p>
+                          <p><strong>Estado:</strong> {{ product['stateProduct.state'] }}</p>
+                          <p><strong>Subcategoría:</strong> {{ product['subcategory.name'] }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+              <tr *ngIf="filteredProducts.length === 0">
+                <td colspan="6" class="center-align">No hay productos que coincidan con los filtros.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="productModal" class="modal">
+  <div class="modal-content">
+    <h4>{{ isEditMode ? 'Editar Producto' : 'Agregar Nuevo Producto' }}</h4>
+    <form [formGroup]="productForm" (ngSubmit)="saveProduct()">
+      <div class="row">
+        <div class="input-field col s12 m6">
+          <input id="name" type="text" formControlName="name">
+          <label for="name" [class.active]="isEditMode || productForm.get('name')?.value">Nombre</label>
+          <div *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched" class="red-text">
+            El nombre es requerido.
+          </div>
+        </div>
+        <div class="input-field col s12 m6">
+          <input id="entry_date" type="date" formControlName="entry_date">
+          <label for="entry_date" [class.active]="isEditMode || productForm.get('entry_date')?.value">Fecha de Entrada</label>
+          <div *ngIf="productForm.get('entry_date')?.invalid && productForm.get('entry_date')?.touched" class="red-text">
+            La fecha de entrada es requerida.
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m6">
+          <input id="expiration_date" type="date" formControlName="expiration_date">
+          <label for="expiration_date" [class.active]="isEditMode || productForm.get('expiration_date')?.value">Fecha de Vencimiento</label>
+        </div>
+        <div class="input-field col s12 m6">
+          <input id="received_by" type="text" formControlName="received_by">
+          <label for="received_by" [class.active]="isEditMode || productForm.get('received_by')?.value">Recibido Por</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m6">
+          <input id="headquarters" type="text" formControlName="headquarters">
+          <label for="headquarters" [class.active]="isEditMode || productForm.get('headquarters')?.value">Sede</label>
+        </div>
+        <div class="input-field col s12 m6">
+          <input id="place_in_inventory" type="text" formControlName="place_in_inventory">
+          <label for="place_in_inventory" [class.active]="isEditMode || productForm.get('place_in_inventory')?.value">Lugar en Inventario</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m4">
+          <input id="quantity" type="number" formControlName="quantity">
+          <label for="quantity" [class.active]="isEditMode || productForm.get('quantity')?.value">Cantidad</label>
+          <div *ngIf="productForm.get('quantity')?.invalid && productForm.get('quantity')?.touched" class="red-text">
+            La cantidad es requerida y debe ser un número.
+          </div>
+        </div>
+        <div class="input-field col s12 m4">
+          <input id="unit" type="number" formControlName="unit">
+          <label for="unit" [class.active]="isEditMode || productForm.get('unit')?.value">Unidad</label>
+        </div>
+        <div class="input-field col s12 m4">
+          <input id="lot" type="text" formControlName="lot">
+          <label for="lot" [class.active]="isEditMode || productForm.get('lot')?.value">Lote</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m6">
+          <select materializeSelect formControlName="id_category">
+            <option value="" disabled selected>Selecciona una Categoría</option>
+            <option *ngFor="let category of categories" [value]="category.id_category">{{ category.name }}</option>
+          </select>
+          <label>Categoría</label>
+          <div *ngIf="productForm.get('id_category')?.invalid && productForm.get('id_category')?.touched" class="red-text">
+            La categoría es requerida.
+          </div>
+        </div>
+        <div class="input-field col s12 m6">
+          <select materializeSelect formControlName="id_provider">
+            <option value="" disabled selected>Selecciona un Proveedor</option>
+            <option *ngFor="let provider of providers" [value]="provider.id_providers">{{ provider.legal_name }}</option>
+          </select>
+          <label>Proveedor</label>
+          <div *ngIf="productForm.get('id_provider')?.invalid && productForm.get('id_provider')?.touched" class="red-text">
+            El proveedor es requerido.
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m6">
+          <input id="id_state_product" type="text" formControlName="id_state_product">
+          <label for="id_state_product" [class.active]="isEditMode || productForm.get('id_state_product')?.value">Estado del Producto</label>
+        </div>
+        <div class="input-field col s12 m6">
+          <select materializeSelect formControlName="id_subcategory">
+            <option value="" disabled selected>Selecciona una Subcategoría</option>
+            <option *ngFor="let subcategory of subcategories" [value]="subcategory.id_subcategory">{{ subcategory.name }}</option>
+          </select>
+          <label>Subcategoría</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m6">
+          <input id="invoice_number" type="text" formControlName="invoice_number">
+          <label for="invoice_number" [class.active]="isEditMode || productForm.get('invoice_number')?.value">Número de Factura</label>
+        </div>
+        <div class="input-field col s12 m6">
+          <input id="code" type="text" formControlName="code">
+          <label for="code" [class.active]="isEditMode || productForm.get('code')?.value">Código</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m6">
+          <input id="unit_weight" type="text" formControlName="unit_weight">
+          <label for="unit_weight" [class.active]="isEditMode || productForm.get('unit_weight')?.value">Peso Unitario</label>
+        </div>
+        <div class="input-field col s12 m6">
+          <input id="total_weight" type="text" formControlName="total_weight">
+          <label for="total_weight" [class.active]="isEditMode || productForm.get('total_weight')?.value">Peso Total</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn waves-effect waves-light green" type="submit" [disabled]="productForm.invalid">
+          Guardar
+          <i class="material-icons right">send</i>
+        </button>
+        <button class="btn waves-effect waves-light red modal-close" type="button">
+          Cancelar
+          <i class="material-icons right">cancel</i>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

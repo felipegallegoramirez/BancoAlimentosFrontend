@@ -1,0 +1,207 @@
+<div class="container">
+  <div class="row">
+    <div class="col s12">
+      <h3 class="center-align">Gestión de Usuarios</h3>
+      <button class="btn waves-effect waves-light green darken-1" (click)="addUser()">
+        Agregar Usuario
+        <i class="material-icons right">person_add</i>
+      </button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="row">
+    <div class="col s12 m6">
+      <h4>Lista de Usuarios</h4>
+      <div class="card">
+        <div class="card-content">
+          <table class="highlight responsive-table">
+            <thead>
+              <tr>
+                <th>Nombre Completo</th>
+                <th>Email</th>
+                <th>Número de Documento</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of users">
+                <td>{{ user.name }} {{ user.lastname }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.num_doc }}</td>
+                <td>{{ getRoleName(user.id_role) }}</td>
+                <td>
+                  <a class="waves-effect waves-light btn-small blue lighten-1" (click)="viewUserDetails(user)">
+                    <i class="material-icons">visibility</i>
+                  </a>
+                  <a class="waves-effect waves-light btn-small orange darken-2" (click)="editUser(user)">
+                    <i class="material-icons">edit</i>
+                  </a>
+                  <a class="waves-effect waves-light btn-small red darken-1" (click)="deleteUser(user.id_user)">
+                    <i class="material-icons">delete</i>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <p *ngIf="users.length === 0" class="center-align">No hay usuarios para mostrar.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col s12 m6">
+      <div *ngIf="selectedUser && !isEditing">
+        <h4>Detalles del Usuario</h4>
+        <div class="card">
+          <div class="card-content">
+            <p><strong>ID de Usuario:</strong> {{ selectedUser.id_user }}</p>
+            <p><strong>Nombre:</strong> {{ selectedUser.name }}</p>
+            <p><strong>Apellido:</strong> {{ selectedUser.lastname }}</p>
+            <p><strong>Tipo de Documento:</strong> {{ getDocumentTypeName(selectedUser.id_type_doc) }}</p>
+            <p><strong>Número de Documento:</strong> {{ selectedUser.num_doc }}</p>
+            <p><strong>Email:</strong> {{ selectedUser.email }}</p>
+            <p><strong>Rol:</strong> {{ getRoleName(selectedUser.id_role) }}</p>
+            <p><strong>Creado el:</strong> {{ selectedUser.created_at | date:'short' }}</p>
+            <p><strong>Actualizado el:</strong> {{ selectedUser.updated_at | date:'short' }}</p>
+            <div class="card-action">
+              <button class="btn waves-effect waves-light orange darken-2" (click)="editUser(selectedUser)">
+                Editar
+                <i class="material-icons right">edit</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="isEditing && selectedUser">
+        <h4>Editar Usuario</h4>
+        <div class="card">
+          <div class="card-content">
+            <form (ngSubmit)="saveUserChanges()">
+              <div class="row">
+                <div class="input-field col s6">
+                  <input id="name" type="text" class="validate" [(ngModel)]="selectedUser.name" name="name" required>
+                  <label for="name" [class.active]="selectedUser.name">Nombre</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="lastname" type="text" class="validate" [(ngModel)]="selectedUser.lastname" name="lastname" required>
+                  <label for="lastname" [class.active]="selectedUser.lastname">Apellido</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                  <select id="edit_type_doc" [(ngModel)]="selectedUser.id_type_doc" name="edit_id_type_doc" required materialize="FormSelect">
+                    <option value="" disabled selected>Seleccione Tipo de Documento</option>
+                    <option *ngFor="let typeDoc of typeDocuments" [value]="typeDoc.id_document">{{ typeDoc.name }}</option>
+                  </select>
+                  <label for="edit_type_doc">Tipo de Documento</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="num_doc" type="text" class="validate" [(ngModel)]="selectedUser.num_doc" name="num_doc" required>
+                  <label for="num_doc" [class.active]="selectedUser.num_doc">Número de Documento</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <input id="email" type="email" class="validate" [(ngModel)]="selectedUser.email" name="email" required>
+                  <label for="email" [class.active]="selectedUser.email">Email</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <input id="password" type="password" class="validate" [(ngModel)]="selectedUser.password" name="password">
+                  <label for="password">Contraseña (dejar en blanco para no cambiar)</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <select id="edit_role" [(ngModel)]="selectedUser.id_role" name="edit_id_role" required materialize="FormSelect">
+                    <option value="" disabled selected>Seleccione un Rol</option>
+                    <option *ngFor="let role of roles" [value]="role.id_role">{{ role.name }}</option>
+                  </select>
+                  <label for="edit_role">Rol</label>
+                </div>
+              </div>
+              <div class="card-action">
+                <button class="btn waves-effect waves-light blue" type="submit">
+                  Guardar Cambios
+                  <i class="material-icons right">save</i>
+                </button>
+                <button class="btn waves-effect waves-light grey" type="button" (click)="cancelEdit()">
+                  Cancelar
+                  <i class="material-icons right">cancel</i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="isAdding">
+        <h4>Agregar Nuevo Usuario</h4>
+        <div class="card">
+          <div class="card-content">
+            <form (ngSubmit)="createNewUser()">
+              <div class="row">
+                <div class="input-field col s6">
+                  <input id="new_name" type="text" class="validate" [(ngModel)]="newUser.name" name="new_name" required>
+                  <label for="new_name">Nombre</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="new_lastname" type="text" class="validate" [(ngModel)]="newUser.lastname" name="new_lastname" required>
+                  <label for="new_lastname">Apellido</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                  <select id="new_type_doc" [(ngModel)]="newUser.id_type_doc" name="new_id_type_doc" required materialize="FormSelect">
+                    <option value="" disabled selected>Seleccione Tipo de Documento</option>
+                    <option *ngFor="let typeDoc of typeDocuments" [value]="typeDoc.id_document">{{ typeDoc.name }}</option>
+                  </select>
+                  <label for="new_type_doc">Tipo de Documento</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="new_num_doc" type="text" class="validate" [(ngModel)]="newUser.num_doc" name="new_num_doc" required>
+                  <label for="new_num_doc">Número de Documento</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <input id="new_email" type="email" class="validate" [(ngModel)]="newUser.email" name="new_email" required>
+                  <label for="new_email">Email</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <input id="new_password" type="password" class="validate" [(ngModel)]="newUser.password" name="new_password" required>
+                  <label for="new_password">Contraseña</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <select id="new_role" [(ngModel)]="newUser.id_role" name="new_id_role" required materialize="FormSelect">
+                    <option value="" disabled selected>Seleccione un Rol</option>
+                    <option *ngFor="let role of roles" [value]="role.id_role">{{ role.name }}</option>
+                  </select>
+                  <label for="new_role">Rol</label>
+                </div>
+              </div>
+              <div class="card-action">
+                <button class="btn waves-effect waves-light green darken-1" type="submit">
+                  Crear Usuario
+                  <i class="material-icons right">add</i>
+                </button>
+                <button class="btn waves-effect waves-light grey" type="button" (click)="cancelAdd()">
+                  Cancelar
+                  <i class="material-icons right">cancel</i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

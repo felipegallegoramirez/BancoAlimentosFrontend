@@ -1,0 +1,148 @@
+<div class="container">
+    <div class="row">
+      <div class="col s12 m6">
+        <h4>Gestión de Categorías</h4>
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Listado de Categorías</span>
+            <button class="btn-small waves-effect waves-light green right" (click)="openCategoryModal()">
+              <i class="material-icons left">add</i>Agregar Categoría
+            </button>
+            <div class="clearfix"></div>
+            <table class="striped responsive-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Creado en</th>
+                  <th>Actualizado en</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="categories.length === 0">
+                  <td colspan="4" class="center-align">No hay categorías disponibles.</td>
+                </tr>
+                <tr *ngFor="let category of categories"
+                    [class.active-row]="selectedCategory?.id_category === category.id_category"
+                    (click)="selectCategory(category)">
+                  <td>{{ category.name }}</td>
+                  <td>{{ category.created_at | date:'short' }}</td>
+                  <td>{{ category.updated_at | date:'short' }}</td>
+                  <td>
+                    <button class="btn-floating btn-small waves-effect waves-light blue tooltipped"
+                            data-position="top" data-tooltip="Editar Categoría"
+                            (click)="openCategoryModal(category); $event.stopPropagation()">
+                      <i class="material-icons">edit</i>
+                    </button>
+                    <button class="btn-floating btn-small waves-effect waves-light red ml-5 tooltipped"
+                            data-position="top" data-tooltip="Eliminar Categoría"
+                            (click)="deleteCategory(category.id_category); $event.stopPropagation()">
+                      <i class="material-icons">delete</i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+  
+      <div class="col s12 m6">
+        <h4>Gestión de Subcategorías</h4>
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Subcategorías de <span *ngIf="selectedCategory">{{ selectedCategory.name }}</span></span>
+            <p *ngIf="!selectedCategory">Selecciona una categoría de la lista para ver sus subcategorías.</p>
+            <div *ngIf="selectedCategory">
+              <button class="btn-small waves-effect waves-light green right" (click)="openSubcategoryModal()">
+                <i class="material-icons left">add</i>Agregar Subcategoría
+              </button>
+              <div class="clearfix"></div>
+              <table class="striped responsive-table mt-10">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Mín. Items</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="subcategories.length === 0">
+                    <td colspan="3" class="center-align">No hay subcategorías para esta categoría.</td>
+                  </tr>
+                  <tr *ngFor="let subcategory of subcategories">
+                    <td>{{ subcategory.name }}</td>
+                    <td>{{ subcategory.min_items }}</td>
+                    <td>
+                      <button class="btn-floating btn-small waves-effect waves-light blue tooltipped"
+                              data-position="top" data-tooltip="Editar Subcategoría"
+                              (click)="openSubcategoryModal(subcategory)">
+                        <i class="material-icons">edit</i>
+                      </button>
+                      <button class="btn-floating btn-small waves-effect waves-light red ml-5 tooltipped"
+                              data-position="top" data-tooltip="Eliminar Subcategoría"
+                              (click)="deleteSubcategory(subcategory.id_subcategory)">
+                        <i class="material-icons">delete</i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="categoryModal" class="modal">
+    <div class="modal-content">
+      <h4>{{ isEditCategoryMode ? 'Editar Categoría' : 'Agregar Nueva Categoría' }}</h4>
+      <form [formGroup]="categoryForm" (ngSubmit)="saveCategory()">
+        <input type="hidden" formControlName="id_category">
+        <div class="input-field">
+          <input id="category_name" type="text" formControlName="name" class="validate">
+          <label for="category_name" [class.active]="isEditCategoryMode || categoryForm.get('name')?.value">Nombre de la Categoría</label>
+          <span class="helper-text red-text" *ngIf="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched">
+            El nombre de la categoría es requerido.
+          </span>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="modal-close waves-effect waves-red btn-flat">Cancelar</button>
+          <button type="submit" class="waves-effect waves-green btn-flat" [disabled]="categoryForm.invalid">
+            {{ isEditCategoryMode ? 'Guardar Cambios' : 'Crear Categoría' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <div id="subcategoryModal" class="modal">
+    <div class="modal-content">
+      <h4>{{ isEditSubcategoryMode ? 'Editar Subcategoría' : 'Agregar Nueva Subcategoría' }}</h4>
+      <form [formGroup]="subcategoryForm" (ngSubmit)="saveSubcategory()">
+        <input type="hidden" formControlName="id_subcategory">
+        <input type="hidden" formControlName="id_category">
+        <div class="input-field">
+          <input id="subcategory_name" type="text" formControlName="name" class="validate">
+          <label for="subcategory_name" [class.active]="isEditSubcategoryMode || subcategoryForm.get('name')?.value">Nombre de la Subcategoría</label>
+          <span class="helper-text red-text" *ngIf="subcategoryForm.get('name')?.invalid && subcategoryForm.get('name')?.touched">
+            El nombre de la subcategoría es requerido.
+          </span>
+        </div>
+        <div class="input-field">
+          <input id="min_items" type="number" formControlName="min_items" class="validate">
+          <label for="min_items" [class.active]="isEditSubcategoryMode || subcategoryForm.get('min_items')?.value">Mínimo de Items</label>
+          <span class="helper-text red-text" *ngIf="subcategoryForm.get('min_items')?.invalid && subcategoryForm.get('min_items')?.touched">
+            El mínimo de items es requerido y debe ser un número positivo.
+          </span>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="modal-close waves-effect waves-red btn-flat">Cancelar</button>
+          <button type="submit" class="waves-effect waves-green btn-flat" [disabled]="subcategoryForm.invalid">
+            {{ isEditSubcategoryMode ? 'Guardar Cambios' : 'Crear Subcategoría' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>

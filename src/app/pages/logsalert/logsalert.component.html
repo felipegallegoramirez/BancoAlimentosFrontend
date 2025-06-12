@@ -1,0 +1,121 @@
+<div class="container">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">Manejo de Logs de Alerta</span>
+  
+        <div class="row">
+          <div class="col s12 m6">
+            <div class="input-field" [formGroup]="filterForm">
+              <input id="search" type="text" formControlName="searchTerm">
+              <label for="search">Buscar</label>
+              <button class="btn-flat" (click)="clearNormalFilter()" *ngIf="filterForm.get('searchTerm').value">
+                <i class="material-icons">clear</i>
+              </button>
+            </div>
+          </div>
+          <div class="col s12 m6 right-align">
+            <a class="waves-effect waves-light btn" (click)="toggleAdvancedFilter()">
+              <i class="material-icons left">filter_list</i>
+              {{ showAdvancedFilter ? 'Ocultar Filtro Avanzado' : 'Filtro Avanzado' }}
+            </a>
+          </div>
+        </div>
+  
+        <div *ngIf="showAdvancedFilter" [@detailExpand]="showAdvancedFilter ? 'expanded' : 'collapsed'" class="advanced-filter-panel">
+          <form [formGroup]="advancedFilterForm">
+            <div class="row">
+              <div class="input-field col s12 m4">
+                <input id="id_log" type="text" formControlName="id_log">
+                <label for="id_log">ID Log</label>
+              </div>
+              <div class="input-field col s12 m4">
+                <input id="subcategory_name" type="text" formControlName="subcategory_name">
+                <label for="subcategory_name">Nombre Subcategoría</label>
+              </div>
+              <div class="input-field col s12 m4">
+                <input id="product" type="text" formControlName="product">
+                <label for="product">Producto</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12 m4">
+                <input id="alert_date_start" type="date" formControlName="alert_date_start" class="datepicker">
+                <label for="alert_date_start">Fecha Alerta (Desde)</label>
+              </div>
+              <div class="input-field col s12 m4">
+                <input id="alert_date_end" type="date" formControlName="alert_date_end" class="datepicker">
+                <label for="alert_date_end">Fecha Alerta (Hasta)</label>
+              </div>
+              <div class="input-field col s12 m4">
+                <input id="alert_type" type="text" formControlName="alert_type">
+                <label for="alert_type">Tipo Alerta</label>
+              </div>
+            </div>
+            <div class="row right-align">
+              <button class="btn waves-effect waves-light red darken-1" type="button" (click)="clearAdvancedFilter()">Limpiar</button>
+              <button class="btn waves-effect waves-light" type="button" (click)="applyAdvancedFilter()">Aplicar Filtro</button>
+            </div>
+          </form>
+        </div>
+  
+        <div class="mat-elevation-z8">
+          <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
+  
+            <ng-container matColumnDef="id_log">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> ID Log </th>
+              <td mat-cell *matCellDef="let element"> {{element.id_log}} </td>
+            </ng-container>
+  
+            <ng-container matColumnDef="subcategory_name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Subcategoría </th>
+              <td mat-cell *matCellDef="let element"> {{element.subcategory.name}} </td>
+            </ng-container>
+  
+            <ng-container matColumnDef="product">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Producto </th>
+              <td mat-cell *matCellDef="let element"> {{element.product.name}} </td>
+            </ng-container>
+  
+            <ng-container matColumnDef="alert_date">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha Alerta </th>
+              <td mat-cell *matCellDef="let element"> {{element.alert_date | date:'short'}} </td>
+            </ng-container>
+  
+            <ng-container matColumnDef="alert_type">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo Alerta </th>
+              <td mat-cell *matCellDef="let element"> {{element.alert_type}} </td>
+            </ng-container>
+  
+            <ng-container matColumnDef="expandedDetail">
+              <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+                <div class="element-detail"
+                     [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                  <div class="row">
+                    <div class="col s12 m6">
+                      <p><strong>ID Subcategoría:</strong> {{element.id_subcategory}}</p>
+                      <p><strong>Mínimo Ítems:</strong> {{element.min_items}}</p>
+                      <p><strong>Cantidad Total:</strong> {{element.total_quantity}}</p>
+                    </div>
+                    <div class="col s12 m6">
+                      <p><strong>ID Producto:</strong> {{element.id_product}}</p>
+                      <p><strong>Subcategoría:</strong> {{element.subcategory.name}}</p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+  
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+                class="example-element-row"
+                [class.example-expanded-row]="element == expandedElement"
+                (click)="expandedElement = expandedElement === element ? null : element">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+          </table>
+  
+          <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        </div>
+      </div>
+    </div>
+  </div>

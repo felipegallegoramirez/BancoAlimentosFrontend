@@ -1,0 +1,25 @@
+<div class="container valign-wrapper" style="height: 100vh;">
+    <div class="row center-align" style="width: 100%;">
+      <div class="col s12 m6 offset-m3">
+        <div class="card z-depth-4" style="border-radius: 15px;">
+          <div class="card-content">
+            <h5 class="center-align">Iniciar Sesión</h5>
+            <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+              <div class="input-field">
+                <input id="email" name="email" type="email" required [(ngModel)]="email">
+                <label for="email">Correo electrónico</label>
+              </div>
+              <div class="input-field">
+                <input id="password" name="password" type="password" required [(ngModel)]="password">
+                <label for="password">Contraseña</label>
+              </div>
+              <button class="btn waves-effect waves-light blue darken-3" type="submit" style="width: 100%; border-radius: 10px;">
+                Iniciar sesión
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

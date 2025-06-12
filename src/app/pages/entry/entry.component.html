@@ -1,0 +1,138 @@
+<div class="container">
+  <div class="row">
+    <div class="col s12">
+      <h3 class="center-align">Entrada de Productos al Inventario</h3>
+    </div>
+  </div>
+
+  <div class="row">
+    <form [formGroup]="entryForm" (ngSubmit)="onSubmit()" class="col s12">
+      <div class="card-panel z-depth-1">
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <input id="name" type="text" formControlName="name" class="validate">
+            <label for="name">Nombre del Producto</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('name')?.invalid && entryForm.get('name')?.touched">Requerido</span>
+          </div>
+          <div class="input-field col s12 m6">
+            <input id="code" type="text" formControlName="code" class="validate">
+            <label for="code">Código de Barras</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('code')?.invalid && entryForm.get('code')?.touched">Requerido</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <input id="invoice_number" type="text" formControlName="invoice_number" class="validate">
+            <label for="invoice_number">Orden de Donación / Número de Factura</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('invoice_number')?.invalid && entryForm.get('invoice_number')?.touched">Requerido</span>
+          </div>
+          <div class="input-field col s12 m6">
+            <select id="id_provider" formControlName="id_provider">
+              <option value="" disabled selected>Seleccione Proveedor</option>
+              <option *ngFor="let provider of providers" [value]="provider.id_providers">{{provider.legal_name}}</option>
+            </select>
+            <label for="id_provider">Proveedor</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('id_provider')?.invalid && entryForm.get('id_provider')?.touched">Requerido</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <input id="expiration_date" type="date" formControlName="expiration_date" class="validate">
+            <label for="expiration_date" class="active">Fecha de Vencimiento</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('expiration_date')?.invalid && entryForm.get('expiration_date')?.touched">Requerido</span>
+          </div>
+          <div class="input-field col s12 m6">
+            <select id="id_category" formControlName="id_category">
+              <option value="" disabled selected>Seleccione Categoría</option>
+              <option *ngFor="let category of categories" [value]="category.id_category">{{category.name}}</option>
+            </select>
+            <label for="id_category">Categoría</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('id_category')?.invalid && entryForm.get('id_category')?.touched">Requerido</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <select id="id_subcategory" formControlName="id_subcategory">
+              <option value="" disabled selected>Seleccione Subcategoría</option>
+              <option *ngFor="let subcategory of subcategories" [value]="subcategory.id_subcategory">{{subcategory.name}}</option>
+            </select>
+            <label for="id_subcategory">Subcategoría</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('id_subcategory')?.invalid && entryForm.get('id_subcategory')?.touched">Requerido</span>
+          </div>
+          <div class="input-field col s12 m6">
+            <input id="lot" type="text" formControlName="lot" class="validate">
+            <label for="lot">Lote</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('lot')?.invalid && entryForm.get('lot')?.touched">Requerido</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="input-field col s12 m4">
+            <input id="unit" type="number" formControlName="unit" class="validate">
+            <label for="unit">Unidad (ej. kg, litros, piezas)</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('unit')?.invalid && entryForm.get('unit')?.touched">Requerido y debe ser numérico</span>
+          </div>
+          <div class="input-field col s12 m4">
+            <input id="quantity" type="number" formControlName="quantity" class="validate">
+            <label for="quantity">Cantidad</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('quantity')?.invalid && entryForm.get('quantity')?.touched">Requerido y debe ser un número entero > 0</span>
+          </div>
+          <div class="input-field col s12 m4">
+            <input id="total_weight" type="text" formControlName="total_weight" class="validate">
+            <label for="total_weight">Peso Total</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('total_weight')?.invalid && entryForm.get('total_weight')?.touched">Requerido</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <input id="entry_date" type="date" formControlName="entry_date" class="validate">
+            <label for="entry_date" class="active">Fecha de Ingreso</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('entry_date')?.invalid && entryForm.get('entry_date')?.touched">Requerido</span>
+          </div>
+          <div class="input-field col s12 m6">
+            <input id="received_by" type="text" formControlName="received_by" class="validate">
+            <label for="received_by">Recibido Por</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('received_by')?.invalid && entryForm.get('received_by')?.touched">Requerido</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <input id="headquarters" type="text" formControlName="headquarters" class="validate">
+            <label for="headquarters">Sede</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('headquarters')?.invalid && entryForm.get('headquarters')?.touched">Requerido</span>
+          </div>
+          <div class="input-field col s12 m6">
+            <input id="place_in_inventory" type="text" formControlName="place_in_inventory" class="validate">
+            <label for="place_in_inventory">Ubicación en Inventario</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('place_in_inventory')?.invalid && entryForm.get('place_in_inventory')?.touched">Requerido</span>
+          </div>
+        </div>
+        <div class="row">
+          <!-- <div class="input-field col s12 m6">
+            <input id="id_state_product" type="text" formControlName="id_state_product" class="validate">
+            <label for="id_state_product">Estado del Producto</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('id_state_product')?.invalid && entryForm.get('id_state_product')?.touched">Requerido</span>
+          </div> -->
+          <div class="input-field col s12 m6">
+            <input id="unit_weight" type="text" formControlName="unit_weight" class="validate">
+            <label for="unit_weight">Peso por Unidad</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('unit_weight')?.invalid && entryForm.get('unit_weight')?.touched">Requerido</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col s12 right-align">
+            <button class="btn waves-effect waves-light green darken-1" type="submit" name="action">
+              Ingresar Producto
+              <i class="material-icons right">send</i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
