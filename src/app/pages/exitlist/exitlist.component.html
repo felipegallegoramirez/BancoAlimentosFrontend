@@ -1,0 +1,110 @@
+<div class="container">
+  <div class="row">
+    <div class="col s12">
+      <h4 class="center-align">
+        <i class="material-icons left">exit_to_app</i>
+        Lista de Salidas de Productos
+      </h4>
+      
+      <!-- Mensaje de error -->
+      <div *ngIf="error" class="card-panel red lighten-4 red-text text-darken-4">
+        <i class="material-icons left">error</i>
+        {{ error }}
+      </div>
+
+      <!-- Loading spinner -->
+      <div *ngIf="loading" class="center-align">
+        <div class="preloader-wrapper big active">
+          <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+              <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+          </div>
+        </div>
+        <p>Cargando datos...</p>
+      </div>
+
+      <!-- Tabla de exits -->
+      <div *ngIf="!loading && exits.length > 0" class="card">
+        <div class="card-content">
+          <table class="striped responsive-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Beneficiario</th>
+                <th>Fecha de Creación</th>
+                <th>Última Actualización</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let exit of exits">
+                <td>{{ exit.id_output || 'N/A' }}</td>
+                <td>
+                  <span class="chip">
+                    <i class="material-icons tiny">inventory</i>
+                    {{ getProductName(exit.id_product) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge blue white-text">
+                    {{ exit.amount_product }}
+                  </span>
+                </td>
+                <td>
+                  <span class="chip">
+                    <i class="material-icons tiny">person</i>
+                    {{ getBeneficiaryName(exit.id_beneficiary) }}
+                  </span>
+                </td>
+                <td>{{ formatDate(exit.created_at) }}</td>
+                <td>{{ formatDate(exit.updated_at) }}</td>
+                <td>
+                  <div class="row" style="margin: 0;">
+                    <div class="col s6">
+                      <button class="btn-small waves-effect waves-light blue" 
+                              title="Ver detalles">
+                        <i class="material-icons">visibility</i>
+                      </button>
+                    </div>
+                    <div class="col s6">
+                      <button class="btn-small waves-effect waves-light red" 
+                              (click)="deleteExit(exit.id_output)"
+                              title="Eliminar">
+                        <i class="material-icons">delete</i>
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mensaje cuando no hay datos -->
+      <div *ngIf="!loading && exits.length === 0" class="card-panel blue lighten-4 blue-text text-darken-4 center-align">
+        <i class="material-icons large">inbox</i>
+        <h5>No hay salidas registradas</h5>
+        <p>No se han encontrado registros de salidas de productos.</p>
+      </div>
+
+      <!-- Botón para agregar nueva salida -->
+      <div class="fixed-action-btn">
+        <a class="btn-floating btn-large waves-effect waves-light red" 
+           routerLink="/exit/new" 
+           title="Agregar nueva salida">
+          <i class="large material-icons">add</i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

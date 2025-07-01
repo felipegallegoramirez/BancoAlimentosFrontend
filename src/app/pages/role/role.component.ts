@@ -29,8 +29,9 @@ export class RoleComponent implements OnInit {
   }
 
   getRoles(): void {
-    this.roleService.getRoles().then(
-      (data: any) => {
+    this.roleService.getRoles().subscribe(
+      (data: Role[]) => {
+        console.log('Roles recibidos del backend:', data);
         this.roles = data;
       },
       error => {
@@ -70,11 +71,26 @@ export class RoleComponent implements OnInit {
   }
 
   editRole(role: Role): void {
-    // Create a deep copy to avoid modifying the original role directly
-    this.newRole = { ...role, permissions: role.permissions ? [...role.permissions] : [] };
-    this.showForm = true;
-    this.isEditing = true;
-    this.selectedRole = null; // Clear selected role when editing
+    const observable = this.roleService.getRole(role.id_role);
+    if (observable) {
+      observable.subscribe((rolCompleto: any) => {
+        const data = rolCompleto.data;
+        const permisosArray = Array.isArray(data.permissions) ? data.permissions : [];
+        const permisos = this.permissions.filter(p =>
+          permisosArray.some((perm: any) => perm.id_permission === p.id_permission)
+        );
+        this.newRole = {
+          id_role: data.id_role,
+          name: data.name,
+          permissions: permisos,
+          created_at: data.created_at ? new Date(data.created_at) : new Date(),
+          updated_at: data.updated_at ? new Date(data.updated_at) : new Date()
+        };
+        this.showForm = true;
+        this.isEditing = true;
+        this.selectedRole = null;
+      });
+    }
   }
 
   async saveRole(): Promise<void> {
@@ -149,14 +165,19 @@ export class RoleComponent implements OnInit {
     if (!this.newRole || !this.newRole.permissions) {
       return false;
     }
-    return this.newRole.permissions.some(p => p.id_permission === permissionId);
+    // Permite comparar tanto si permissions es array de objetos como de strings
+    return this.newRole.permissions.some((p: any) =>
+      typeof p === 'string' ? p === permissionId : p.id_permission === permissionId
+    );
   }
 
   togglePermission(permission: Permission): void {
     if (!this.newRole) return;
 
     if (this.newRole.permissions) {
-      const index = this.newRole.permissions.findIndex(p => p.id_permission === permission.id_permission);
+      const index = this.newRole.permissions.findIndex((p: any) =>
+        typeof p === 'string' ? p === permission.id_permission : p.id_permission === permission.id_permission
+      );
       if (index > -1) {
         // Permission is already assigned, remove it
         this.newRole.permissions.splice(index, 1);

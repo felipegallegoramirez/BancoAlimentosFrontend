@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient,HttpHeaders  } from "@angular/common/http";
 import { Role } from "../models/role.model";
 import { PermsService } from "./perms.service";
+import { Observable, from, switchMap, of } from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -19,60 +20,70 @@ export class RoleService {
     })
   };
 
-  async postRole(Role: Role) {
+  postRole(Role: Role): Observable<Role> | null {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'create_role');
-    if (perms) {
-      return this.http.post<Role>(this.URL_API, Role,this.httpOptions);
-    } else {
-      return null;
-    }
-    return this.http.post<Role>(this.URL_API, Role,this.httpOptions);
+    return from(this.permsService.getPerms(id_user, 'create_role')).pipe(
+      switchMap(perms => {
+        if (perms) {
+          return this.http.post<Role>(this.URL_API, Role, this.httpOptions);
+        } else {
+          return of(null);
+        }
+      })
+    );
   }
 
-  async getRoles() {
+  getRoles(): Observable<Role[]> | null {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'read_role');
-    if (perms) {
-      return this.http.get<Role[]>(this.URL_API+``,this.httpOptions);
-    } else {
-      return null;
-    }
-    return this.http.get<Role[]>(this.URL_API+``,this.httpOptions);
+    return from(this.permsService.getPerms(id_user, 'read_role')).pipe(
+      switchMap(perms => {
+        if (perms) {
+          return this.http.get<Role[]>(this.URL_API+``, this.httpOptions);
+        } else {
+          return of(null);
+        }
+      })
+    );
   }
 
 
-  async getRole(id:string) {
+  getRole(id:string): Observable<Role> | null {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'read_role');
-    if (perms) {
-      return this.http.get<Role>(this.URL_API+`/${id}`,this.httpOptions);
-    } else {
-      return null;
-    }
-    return this.http.get<Role>(this.URL_API+`/${id}`,this.httpOptions);
+    return from(this.permsService.getPerms(id_user, 'read_role')).pipe(
+      switchMap(perms => {
+        if (perms) {
+          return this.http.get<Role>(this.URL_API+`/${id}`, this.httpOptions);
+        } else {
+          return of(null);
+        }
+      })
+    );
   }
 
-  async putRole(id:string, Role: Role) {
+  putRole(id:string, Role: Role): Observable<Role> | null {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'edit_role');
-    if (perms) {
-      return this.http.put<Role>(this.URL_API+`/${id}`,Role,this.httpOptions);
-    } else {
-      return null;
-    }
-    return this.http.put<Role>(this.URL_API+`/${id}`,Role,this.httpOptions);
+    return from(this.permsService.getPerms(id_user, 'edit_role')).pipe(
+      switchMap(perms => {
+        if (perms) {
+          return this.http.put<Role>(this.URL_API+`/${id}`, Role, this.httpOptions);
+        } else {
+          return of(null);
+        }
+      })
+    );
   }
 
-  async deleteRole(id: string) {
+  deleteRole(id: string): Observable<any> | null {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'delete_role');
-    if (perms) {
-      return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
-    } else {
-      return null;
-    }
-    return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
+    return from(this.permsService.getPerms(id_user, 'delete_role')).pipe(
+      switchMap(perms => {
+        if (perms) {
+          return this.http.delete(this.URL_API+`/${id}`, this.httpOptions);
+        } else {
+          return of(null);
+        }
+      })
+    );
   }
 
 

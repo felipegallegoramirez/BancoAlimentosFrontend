@@ -24,7 +24,7 @@ export class ProductService {
 
   async postProduct(Product: Product) {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'create_product');
+    const perms = await this.permsService.getPerms(id_user, 'create_inventory');
     if (perms) {
       return this.http.post<Product>(this.URL_API, Product,this.httpOptions);
     } else {
@@ -35,9 +35,9 @@ export class ProductService {
 
   async getProducts() {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'read_product');
+    const perms = await this.permsService.getPerms(id_user, 'read_inventory');
     if (perms) {
-      return this.http.get<Product[]>(this.URL_API+``,this.httpOptions);
+      return this.http.get<Product[]>(this.URL_API,this.httpOptions).toPromise();
     } else {
       return null;
     }
@@ -46,9 +46,9 @@ export class ProductService {
 
   async getProduct(id:string) {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'read_product');
+    const perms = await this.permsService.getPerms(id_user, 'read_inventory');
     if (perms) {
-      return this.http.get<Product>(this.URL_API+`/${id}`,this.httpOptions);
+      return this.http.get<Product>(this.URL_API+`/${id}`,this.httpOptions).toPromise();  
     } else {
       return null;
     }
@@ -56,9 +56,9 @@ export class ProductService {
 
   async getProductByCode(id:string) {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'read_product');
+    const perms = await this.permsService.getPerms(id_user, 'read_inventory');
     if (perms) {
-      return this.http.get<Product>(this.URL_API+`/code/${id}`,this.httpOptions);
+      return this.http.get<Product>(this.URL_API+`/code/${id}`,this.httpOptions)  ;
     } else {
       return null;
     }
@@ -66,7 +66,7 @@ export class ProductService {
 
   async putProduct(id:string, Product: Product) {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'edit_product');
+    const perms = await this.permsService.getPerms(id_user, 'edit_inventory');
     if (perms) {
       return this.http.put(this.URL_API+`/${id}`,Product,this.httpOptions);
     } else {
@@ -77,7 +77,7 @@ export class ProductService {
   async deleteProduct(id: string | undefined) {
     if (!id) throw new Error('ID is required');
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'delete_product');
+    const perms = await this.permsService.getPerms(id_user, 'delete_inventory');
     if (perms) {
       return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
     } else {

@@ -1,0 +1,119 @@
+<div class="container">
+    <div class="row">
+      <div class="col s12 m6">
+        <h4>Gestión de Beneficiarios</h4>
+      </div>
+    </div>
+  
+    <div class="row">
+      <div class="col s12 m6">
+        <div class="input-field">
+          <input id="search" type="text" [(ngModel)]="searchTerm" (keyup)="applyFilter()">
+          <label for="search">Filtrar por nombre o RUC</label>
+        </div>
+      </div>
+      <div class="col s12 m6 right-align">
+        <a class="waves-effect waves-light btn blue" (click)="addBeneficiary()">
+          <i class="material-icons left">add</i>Agregar Beneficiario
+        </a>
+      </div>
+    </div>
+  
+    <div class="row">
+      <div class="col s12">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Listado de Beneficiarios</span>
+            <table class="responsive-table highlight">
+              <thead>
+                <tr>
+                  <th>Razón Social</th>
+                  <th>Nombre Comercial</th>
+                  <th>Número Documento</th>
+                  <th>Representante Legal</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let beneficiary of filteredBeneficiaries" (click)="selectBeneficiary(beneficiary)"
+                  [class.selected]="beneficiary.id_beneficiary === selectedBeneficiary?.id_beneficiary">
+                  <td>{{ beneficiary.legal_name }}</td>
+                  <td>{{ beneficiary.trade_name }}</td>
+                  <td>{{ beneficiary.num_doc }}</td>
+                  <td>{{ beneficiary.legal_representative }}</td>
+                  <td>
+                    <a class="waves-effect waves-light btn-small green darken-2" (click)="editBeneficiary(beneficiary); $event.stopPropagation()">
+                      <i class="material-icons">edit</i>
+                    </a>
+                  </td>
+                </tr>
+                <tr *ngIf="filteredBeneficiaries.length === 0">
+                  <td colspan="5" class="center-align">No hay beneficiarios para mostrar.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="row" *ngIf="selectedBeneficiary || isAdding">
+      <div class="col s12">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">{{ isAdding ? 'Nuevo Beneficiario' : 'Detalle / Edición de Beneficiario' }}</span>
+  
+            <form #beneficiaryForm="ngForm">
+              <div class="row">
+                <div class="input-field col s12 m6">
+                  <input id="legal_name" type="text" [(ngModel)]="currentBeneficiary.legal_name" name="legal_name" required [disabled]="!isAdding && !isEditing">
+                  <label [class.active]="currentBeneficiary.legal_name" for="legal_name">Razón Social</label>
+                </div>
+                <div class="input-field col s12 m6">
+                  <input id="trade_name" type="text" [(ngModel)]="currentBeneficiary.trade_name" name="trade_name" [disabled]="!isAdding && !isEditing">
+                  <label [class.active]="currentBeneficiary.trade_name" for="trade_name">Nombre Comercial</label>
+                </div>
+              </div>
+  
+              <div class="row">
+                <div class="input-field col s12 m6">
+                  <input id="num_doc" type="text" [(ngModel)]="currentBeneficiary.num_doc" name="num_doc" required [disabled]="!isAdding && !isEditing">
+                  <label [class.active]="currentBeneficiary.num_doc" for="num_doc">Número de Documento</label>
+                </div>
+                <div class="input-field col s12 m6">
+                  <select id="id_type_doc" [(ngModel)]="currentBeneficiary.id_type_doc" name="id_type_doc" required [disabled]="!isAdding && !isEditing"
+                    materializeSelect [materializeSelectOptions]="typeDocuments">
+                    <option value="" disabled selected>Selecciona Tipo de Documento</option>
+                    <option *ngFor="let type of typeDocuments" [value]="type.id_document">{{ type.name }}</option>
+                  </select>
+                  <label for="id_type_doc">Tipo de Documento</label>
+                </div>
+              </div>
+  
+              <div class="row">
+                <div class="input-field col s12 m6">
+                  <input id="legal_representative" type="text" [(ngModel)]="currentBeneficiary.legal_representative" name="legal_representative" required [disabled]="!isAdding && !isEditing">
+                  <label [class.active]="currentBeneficiary.legal_representative" for="legal_representative">Representante Legal</label>
+                </div>
+                <div class="input-field col s12 m6">
+                  <input id="address" type="text" [(ngModel)]="currentBeneficiary.address" name="address" required [disabled]="!isAdding && !isEditing">
+                  <label [class.active]="currentBeneficiary.address" for="address">Dirección</label>
+                </div>
+              </div>
+  
+              <div class="row">
+                <div class="col s12">
+                  <button class="btn waves-effect waves-light blue" type="button" (click)="saveBeneficiary()" [disabled]="!beneficiaryForm.valid || (!isAdding && !isEditing)">
+                    <i class="material-icons left">save</i>Guardar
+                  </button>
+                  <button class="btn waves-effect waves-light grey darken-1 ml-1" type="button" (click)="cancelForm()">
+                    <i class="material-icons left">cancel</i>Cancelar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

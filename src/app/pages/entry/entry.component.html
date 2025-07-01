@@ -43,6 +43,17 @@
 
         <div class="row">
           <div class="input-field col s12 m6">
+            <select id="id_donor" formControlName="id_donor">
+              <option value="" disabled selected>Seleccione Donante</option>
+              <option *ngFor="let donor of donors" [value]="donor.id_providers">{{donor.legal_name}}</option>
+            </select>
+            <label for="id_donor">Donante</label>
+            <span class="helper-text red-text" *ngIf="entryForm.get('id_donor')?.invalid && entryForm.get('id_donor')?.touched">Requerido</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="input-field col s12 m6">
             <input id="expiration_date" type="date" formControlName="expiration_date" class="validate">
             <label for="expiration_date" class="active">Fecha de Vencimiento</label>
             <span class="helper-text red-text" *ngIf="entryForm.get('expiration_date')?.invalid && entryForm.get('expiration_date')?.touched">Requerido</span>
@@ -136,4 +147,13 @@
   </div>
 </div>
 
-<ngx-barcode-scanner [hidden]="!barcodeScanning" (valueChanges)="onCodeChange($event)"></ngx-barcode-scanner>
+<!-- Modal para escaneo de código de barras -->
+<div id="barcodeModal" class="modal">
+  <div class="modal-content">
+    <h5>Escanear Código de Barras</h5>
+    <ngx-barcode-scanner [(value)]="scannedCode" [codes]="['ean', 'ean_8', 'upc', 'upc_e', 'code_128']"></ngx-barcode-scanner>
+  </div>
+  <div class="modal-footer">
+    <button class="modal-close btn-flat">Cerrar</button>
+  </div>
+</div>

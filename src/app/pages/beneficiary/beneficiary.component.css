@@ -1,0 +1,31 @@
+/* beneficiary.component.css */
+.container {
+    margin-top: 20px;
+  }
+  
+  .card {
+    margin-top: 20px;
+  }
+  
+  table tr {
+    cursor: pointer;
+  }
+  
+  table tr.selected {
+    background-color: #e3f2fd !important; /* Light blue background for selected row */
+  }
+  
+  .ml-1 {
+    margin-left: 10px;
+  }
+  
+  /* Adjust Materialize select label for dynamic content */
+  .input-field label.active {
+    transform: translateY(-14px) scale(0.8);
+    transform-origin: 0 0;
+  }
+  
+  /* Ensure the Materialize select wrapper allows label to be active */
+  .input-field > select.browser-default + label {
+    top: -14px; /* Adjust if using browser-default select */
+  }

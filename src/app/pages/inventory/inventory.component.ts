@@ -106,8 +106,8 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
   loadProducts(): void {
     this.productService.getProducts().then(
       (data: any) => {
-        console.log(data);
-        this.products = data;
+        this.products = data as Product[];
+        console.log(this.products);
         this.applyFilter(); // Apply initial filter
       },
       error => {

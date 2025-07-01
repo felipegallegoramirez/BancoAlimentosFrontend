@@ -84,26 +84,23 @@ export class CategoryComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async loadCategories(): Promise<void> {
-    const observable = await this.categoryService.getCategorys();
-    if (observable) {
-      observable.subscribe({
-        next: (data: Category[]) => {
-          this.categories = data;
-          if (this.selectedCategory) {
-            const reselected = this.categories.find(c => c.id_category === this.selectedCategory?.id_category);
-            if (reselected) {
-              this.selectCategory(reselected);
-            } else {
-              this.selectedCategory = null;
-              this.subcategories = [];
-            }
+    try {
+      const data = await this.categoryService.getCategorys();
+      if (data) {
+        this.categories = data;
+        if (this.selectedCategory) {
+          const reselected = this.categories.find(c => c.id_category === this.selectedCategory?.id_category);
+          if (reselected) {
+            this.selectCategory(reselected);
+          } else {
+            this.selectedCategory = null;
+            this.subcategories = [];
           }
-        },
-        error: (err) => {
-          M.toast({ html: 'Error al cargar categorías', classes: 'red darken-2' });
-          console.error(err);
         }
-      });
+      }
+    } catch (err) {
+      M.toast({ html: 'Error al cargar categorías', classes: 'red darken-2' });
+      console.error(err);
     }
   }
 
@@ -113,17 +110,14 @@ export class CategoryComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async loadSubcategories(categoryId: string): Promise<void> {
-    const observable = await this.subcategoryService.getSubcategorys();
-    if (observable) {
-      observable.subscribe({
-        next: (data: Subcategory[]) => {
-          this.subcategories = data.filter(sub => sub.id_category === categoryId);
-        },
-        error: (err) => {
-          M.toast({ html: 'Error al cargar subcategorías', classes: 'red darken-2' });
-          console.error(err);
-        }
-      });
+    try {
+      const data = await this.subcategoryService.getSubcategorys();
+      if (data) {
+        this.subcategories = data.filter(sub => sub.id_category === categoryId);
+      }
+    } catch (err) {
+      M.toast({ html: 'Error al cargar subcategorías', classes: 'red darken-2' });
+      console.error(err);
     }
   }
 

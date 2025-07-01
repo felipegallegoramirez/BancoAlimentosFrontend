@@ -1,0 +1,40 @@
+/* email.component.css */
+.container {
+    margin-top: 20px;
+  }
+  
+  .card {
+    margin-top: 20px;
+  }
+  
+  table tr {
+    cursor: pointer;
+  }
+  
+  table tr.selected {
+    background-color: #e3f2fd !important; /* Light blue background for selected row */
+  }
+  
+  .ml-1 {
+    margin-left: 10px;
+  }
+  
+  /* Adjust Materialize input label for dynamic content */
+  .input-field label.active {
+    transform: translateY(-14px) scale(0.8);
+    transform-origin: 0 0;
+  }
+  
+  /* Email specific styles */
+  .email-table td:nth-child(2) {
+    font-family: monospace;
+    color: #1976d2;
+  }
+  
+  /* Responsive adjustments for email addresses */
+  @media only screen and (max-width: 600px) {
+    .email-table td:nth-child(2) {
+      font-size: 0.8em;
+      word-break: break-all;
+    }
+  }

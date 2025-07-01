@@ -22,7 +22,7 @@ export class LogsAlertsService {
 
   async postLogsAlert(LogsAlert: LogsAlert) {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'create_logs');
+    const perms = await this.permsService.getPerms(id_user, 'read_logs');
     if (perms) {
       return this.http.post<LogsAlert>(this.URL_API, LogsAlert,this.httpOptions);
     } else {
@@ -34,7 +34,7 @@ export class LogsAlertsService {
     const id_user = localStorage.getItem('id');
     const perms = await this.permsService.getPerms(id_user, 'read_logs');
     if (perms) {
-      return this.http.get<LogsAlert[]>(this.URL_API+``,this.httpOptions);
+      return this.http.get<LogsAlert[]>(this.URL_API+``,this.httpOptions).toPromise();
     } else {
       return null;
     }
@@ -53,7 +53,7 @@ export class LogsAlertsService {
 
   async putLogsAlert(id:string, LogsAlert: LogsAlert) {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'edit_logs');
+    const perms = await this.permsService.getPerms(id_user, 'read_logs');
     if (perms) {
       return this.http.put<LogsAlert>(this.URL_API+`/${id}`,LogsAlert,this.httpOptions);
     } else {
@@ -63,7 +63,7 @@ export class LogsAlertsService {
 
   async deleteLogsAlert(id: string) {
     const id_user = localStorage.getItem('id');
-    const perms = await this.permsService.getPerms(id_user, 'delete_logs');
+    const perms = await this.permsService.getPerms(id_user, 'read_logs');
     if (perms) {
       return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
     } else {

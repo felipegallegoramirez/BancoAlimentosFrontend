@@ -34,7 +34,7 @@ export class SubcategoryService {
     const id_user = localStorage.getItem('id');
     const perms = await this.permsService.getPerms(id_user, 'read_subcategory');
     if (perms) {
-      return this.http.get<Subcategory[]>(this.URL_API+``,this.httpOptions);
+      return this.http.get<Subcategory[]>(this.URL_API+``,this.httpOptions).toPromise();
     } else {
       return null;
     }

@@ -56,7 +56,7 @@ export class SupplierComponent implements OnInit, AfterViewInit {
 
   loadProviders(): void {
     this.providerService.getProviders().then(
-      (data: any) => {
+      (data: Provider[]) => {
         this.providers = data;
         this.applyFilter(); // Apply filter initially to populate filteredProviders
       },
@@ -68,10 +68,10 @@ export class SupplierComponent implements OnInit, AfterViewInit {
   }
 
   loadTypeDocuments(): void {
-    this.typeDocumentService.getTypeDocuments().then(
+    this.typeDocumentService.getTypeDocuments().subscribe(
       (data: any) => {
         
-        this.typeDocuments = data.data;
+        this.typeDocuments = data?.data as TypeDocument[];
         console.log(this.typeDocuments);
         // Re-initialize Materialize selects after data is loaded
         setTimeout(() => {

@@ -13,6 +13,11 @@ import { SupplierComponent } from './pages/supplier/supplier.component';
 import { CategoryComponent } from './pages/category/category.component';
 import { RoleComponent } from './pages/role/role.component';
 import { LogsalertComponent } from './pages/logsalert/logsalert.component';
+import { DonorComponent } from './pages/donor/donor.component';
+import { BeneficiaryComponent } from './pages/beneficiary/beneficiary.component';
+import { ExitlistComponent } from './pages/exitlist/exitlist.component';
+import { EmailComponent } from './pages/email/email.component';
+
 
 import { AuthGuard } from './guards/auth.guard';
 
@@ -29,6 +34,11 @@ const routes: Routes = [
   { path: 'category', component: CategoryComponent, canActivate: [AuthGuard] },
   { path: 'role', component: RoleComponent, canActivate: [AuthGuard] },
   { path: 'logsalert', component: LogsalertComponent, canActivate: [AuthGuard] },
+  { path: 'donor', component: DonorComponent, canActivate: [AuthGuard] },
+  { path: 'beneficiary', component: BeneficiaryComponent, canActivate: [AuthGuard] },
+  { path: 'exitlist', component: ExitlistComponent, canActivate: [AuthGuard] },
+  { path: 'email', component: EmailComponent, canActivate: [AuthGuard] },
+
   { path: '**', redirectTo: 'landing' }
 ];
 

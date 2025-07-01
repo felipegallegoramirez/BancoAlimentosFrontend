@@ -1,0 +1,105 @@
+<div class="container">
+    <div class="row">
+      <div class="col s12 m6">
+        <h4>Gestión de Correos Electrónicos</h4>
+      </div>
+    </div>
+  
+    <div class="row">
+      <div class="col s12 m6">
+        <div class="input-field">
+          <input id="search" type="text" [(ngModel)]="searchTerm" (keyup)="applyFilter()">
+          <label for="search">Filtrar por nombre o correo</label>
+        </div>
+      </div>
+      <div class="col s12 m6 right-align">
+        <a class="waves-effect waves-light btn blue" (click)="addEmail()">
+          <i class="material-icons left">add</i>Agregar Correo
+        </a>
+      </div>
+    </div>
+  
+    <div class="row">
+      <div class="col s12">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Listado de Correos Electrónicos</span>
+            <table class="responsive-table highlight email-table">
+              <thead>
+                <tr>
+                  <th>Nombre del Propietario</th>
+                  <th>Correo Electrónico</th>
+                  <th>Fecha de Creación</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let email of filteredEmails" (click)="selectEmail(email)"
+                  [class.selected]="email.id_email === selectedEmail?.id_email">
+                  <td>{{ email.name_owner }}</td>
+                  <td>{{ email.email }}</td>
+                  <td>{{ email.created_at | date:'dd/MM/yyyy' }}</td>
+                  <td>
+                    <a class="waves-effect waves-light btn-small green darken-2" (click)="editEmail(email); $event.stopPropagation()">
+                      <i class="material-icons">edit</i>
+                    </a>
+                    <a class="waves-effect waves-light btn-small red darken-2 ml-1" (click)="deleteEmail(email.id_email!); $event.stopPropagation()">
+                      <i class="material-icons">delete</i>
+                    </a>
+                  </td>
+                </tr>
+                <tr *ngIf="filteredEmails.length === 0">
+                  <td colspan="4" class="center-align">No hay correos para mostrar.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="row" *ngIf="selectedEmail || isAdding">
+      <div class="col s12">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">{{ isAdding ? 'Nuevo Correo' : 'Detalle / Edición de Correo' }}</span>
+  
+            <form #emailForm="ngForm">
+              <div class="row">
+                <div class="input-field col s12 m6">
+                  <input id="name_owner" type="text" [(ngModel)]="currentEmail.name_owner" name="name_owner" required [disabled]="!isAdding && !isEditing">
+                  <label [class.active]="currentEmail.name_owner" for="name_owner">Nombre del Propietario</label>
+                </div>
+                <div class="input-field col s12 m6">
+                  <input id="email" type="email" [(ngModel)]="currentEmail.email" name="email" required [disabled]="!isAdding && !isEditing">
+                  <label [class.active]="currentEmail.email" for="email">Correo Electrónico</label>
+                </div>
+              </div>
+  
+              <div class="row" *ngIf="!isAdding">
+                <div class="input-field col s12 m6">
+                  <input id="created_at" type="text" [value]="currentEmail.created_at | date:'dd/MM/yyyy HH:mm'" disabled>
+                  <label class="active" for="created_at">Fecha de Creación</label>
+                </div>
+                <div class="input-field col s12 m6">
+                  <input id="updated_at" type="text" [value]="currentEmail.updated_at | date:'dd/MM/yyyy HH:mm'" disabled>
+                  <label class="active" for="updated_at">Última Actualización</label>
+                </div>
+              </div>
+  
+              <div class="row">
+                <div class="col s12">
+                  <button class="btn waves-effect waves-light blue" type="button" (click)="saveEmail()" [disabled]="!emailForm.valid || (!isAdding && !isEditing)">
+                    <i class="material-icons left">save</i>Guardar
+                  </button>
+                  <button class="btn waves-effect waves-light grey darken-1 ml-1" type="button" (click)="cancelForm()">
+                    <i class="material-icons left">cancel</i>Cancelar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -24,7 +24,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 })
 export class LogsalertComponent implements OnInit {
   dataSource: MatTableDataSource<LogsAlert>;
-  displayedColumns: string[] = ['id_log', 'subcategory_name', 'product', 'alert_date', 'alert_type'];
+  displayedColumns: string[] = ['id_log', 'subcategory_name', 'product', 'alert_date', 'alert_type', 'actions'];
   expandedElement: LogsAlert | null;
   logsAlerts: LogsAlert[] = [];
   filterForm: FormGroup;
@@ -152,5 +152,13 @@ export class LogsalertComponent implements OnInit {
   clearAdvancedFilter(): void {
     this.advancedFilterForm.reset();
     this.loadLogsAlerts(); // Reload all data after clearing advanced filter
+  }
+
+  deleteLogAlert(id: string): void {
+    if (confirm('¿Estás seguro de que deseas eliminar este log?')) {
+      this.logsAlertService.deleteLogsAlert(id).then(() => {
+        this.loadLogsAlerts();
+      });
+    }
   }
 }

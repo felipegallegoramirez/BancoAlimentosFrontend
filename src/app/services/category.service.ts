@@ -35,7 +35,7 @@ export class CategoryService {
     const id = localStorage.getItem('id');
     const perms = await this.permsService.getPerms(id, 'read_category');
     if (perms) {
-      return this.http.get<Category[]>(this.URL_API+``,this.httpOptions);
+      return this.http.get<Category[]>(this.URL_API+``,this.httpOptions).toPromise();
     } else {
       return null;
     }

@@ -1,12 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Product } from '../../models/product.model';
 import { Category } from '../../models/category.model';
 import { Provider } from '../../models/provider.model';
+import { Donor } from '../../models/donor.model';
 import { Subcategory } from '../../models/subcategory.model';
 import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
 import { ProviderService } from '../../services/provider.service';
+import { DonorService } from '../../services/donor.service';
 import { SubcategoryService } from '../../services/subcategory.service';
 import { NgxBarcodeScannerComponent } from '@eisberg-labs/ngx-barcode-scanner';
 
@@ -18,21 +20,23 @@ declare var M: any;
   templateUrl: './entry.component.html',
   styleUrls: ['./entry.component.css']
 })
-export class EntryComponent implements OnInit {
+export class EntryComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(NgxBarcodeScannerComponent)
   scanner!: NgxBarcodeScannerComponent;
 
+  scannedCode: string = '';
   entryForm: FormGroup;
   categories: Category[] = [];
   providers: Provider[] = [];
+  donors: Donor[] = [];
   subcategories: Subcategory[] = [];
-  barcodeScanning: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
     private categoryService: CategoryService,
     private providerService: ProviderService,
+    private donorService: DonorService,
     private subcategoryService: SubcategoryService
   ) {
     this.entryForm = this.fb.group({
@@ -40,6 +44,7 @@ export class EntryComponent implements OnInit {
       code: ['', Validators.required],
       invoice_number: ['', Validators.required],
       id_provider: ['', Validators.required],
+      id_donor: ['', Validators.required],
       expiration_date: ['', Validators.required],
       id_category: ['', Validators.required],
       id_subcategory: ['', Validators.required],
@@ -59,6 +64,7 @@ export class EntryComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategories();
     this.loadProviders();
+    this.loadDonors();
     this.loadSubcategories();
 
     $(document).ready(() => {
@@ -69,10 +75,16 @@ export class EntryComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit(): void {
+    const elems = document.querySelectorAll('.modal');
+    M.Modal.init(elems);
+    console.log('Modal inicializado:', elems);
+  }
+
   loadCategories(): void {
     this.categoryService.getCategorys().then(
       (data: any) => {
-        this.categories = data;
+        this.categories = data as Category[];
         this.initializeSelects();
       },
       (_error) => {
@@ -84,11 +96,23 @@ export class EntryComponent implements OnInit {
   loadProviders(): void {
     this.providerService.getProviders().then(
       (data: any) => {
-        this.providers = data;
+        this.providers = data as Provider[];
         this.initializeSelects();
       },
       (_error) => {
         M.toast({ html: 'Error al cargar proveedores.' });
+      }
+    );
+  }
+
+  loadDonors(): void {
+    this.donorService.getDonors().then(
+      (data: any) => {
+        this.donors = data as Donor[];
+        this.initializeSelects();
+      },
+      (_error) => {
+        M.toast({ html: 'Error al cargar donantes.' });
       }
     );
   }
@@ -134,6 +158,7 @@ export class EntryComponent implements OnInit {
         this.entryForm.reset();
         this.entryForm.controls['id_category'].setValue('');
         this.entryForm.controls['id_provider'].setValue('');
+        this.entryForm.controls['id_donor'].setValue('');
         this.entryForm.controls['id_subcategory'].setValue('');
         setTimeout(() => $('select').formSelect(), 0);
         const today = new Date();
@@ -148,30 +173,46 @@ export class EntryComponent implements OnInit {
   }
 
   openBarcodeScanner(): void {
-    this.barcodeScanning = true;
+    this.scannedCode = '';
+    const modalElem = document.getElementById('barcodeModal');
+    if (modalElem) {
+      const instance = M.Modal.getInstance(modalElem);
+      instance.open();
+    }
   }
 
-  onCodeChange(event: any): void {
-    const code = event.value || event;
-    this.entryForm.patchValue({ code: code });
-    this.barcodeScanning = false;
-    this.getProductByCode(code);
+  ngDoCheck(): void {
+    if (this.scannedCode && this.entryForm.get('code')?.value !== this.scannedCode) {
+      this.entryForm.patchValue({ code: this.scannedCode });
+      M.updateTextFields();
+      const modalElem = document.getElementById('barcodeModal');
+      if (modalElem) {
+        const instance = M.Modal.getInstance(modalElem);
+        instance.close();
+      }
+      this.getProductByCode(this.scannedCode);
+    }
   }
 
   getProductByCode(code: string): void {
     this.productService.getProductByCode(code).then((observable) => {
       observable.subscribe({
-        next: (product: Product) => {
+        next: (data: any) => {
+          console.log('Producto recibido del backend:', data);
+          const product = data.data as Product;
           if (product) {
             this.entryForm.patchValue({
               name: product.name,
               id_provider: product.id_provider,
+              id_donor: product.id_donor,
               id_category: product.id_category,
               id_subcategory: product.id_subcategory,
               unit_weight: product.unit_weight
             });
-            this.initializeSelects();
-            M.updateTextFields();
+            setTimeout(() => {
+              this.initializeSelects();
+              M.updateTextFields();
+            }, 200);
           } else {
             M.toast({ html: 'Producto no encontrado con este código de barras.' });
           }
@@ -181,5 +222,9 @@ export class EntryComponent implements OnInit {
         }
       });
     });
+  }
+
+  ngOnDestroy(): void {
+    // Cleanup code if needed
   }
 }

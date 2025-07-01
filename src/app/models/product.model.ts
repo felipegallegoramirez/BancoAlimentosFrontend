@@ -13,6 +13,7 @@ export interface Product {
   id_state_product: string;
   id_subcategory: string;
   id_provider: string;
+  id_donor: string;
   invoice_number: string;
   code: string;
   unit_weight: string;

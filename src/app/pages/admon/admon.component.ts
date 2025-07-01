@@ -56,54 +56,48 @@ export class AdmonComponent implements OnInit, OnDestroy {
     };
   }
 
-  async loadUsers(): Promise<void> {
-    const observable = await this.userService.getUsers();
-    if (observable) {
-      const sub = observable.subscribe({
-        next: (data: User[]) => {
-          this.users = data;
-        },
-        error: (error) => {
-          console.error('Error loading users:', error);
-          M.toast({ html: 'Error al cargar usuarios', classes: 'red' });
-        }
-      });
-      this.subscriptions.push(sub);
-    }
+  loadUsers(): void {
+    const observable = this.userService.getUsers();
+    const sub = observable.subscribe({
+      next: (data: User[]) => {
+        this.users = data;
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
+        M.toast({ html: 'Error al cargar usuarios', classes: 'red' });
+      }
+    });
+    this.subscriptions.push(sub);
   }
 
-  async loadRoles(): Promise<void> {
-    const observable = await this.roleService.getRoles();
-    if (observable) {
-      const sub = observable.subscribe({
-        next: (data: Role[]) => {
-          this.roles = data;
-          this.initializeSelectInputs();
-        },
-        error: (error) => {
-          console.error('Error loading roles:', error);
-          M.toast({ html: 'Error al cargar roles', classes: 'red' });
-        }
-      });
-      this.subscriptions.push(sub);
-    }
+  loadRoles(): void {
+    const observable = this.roleService.getRoles();
+    const sub = observable.subscribe({
+      next: (data: Role[]) => {
+        this.roles = data;
+        this.initializeSelectInputs();
+      },
+      error: (error) => {
+        console.error('Error loading roles:', error);
+        M.toast({ html: 'Error al cargar roles', classes: 'red' });
+      }
+    });
+    this.subscriptions.push(sub);
   }
 
-  async loadTypeDocuments(): Promise<void> {
-    const observable = await this.typeDocumentService.getTypeDocuments();
-    if (observable) {
-      const sub = observable.subscribe({
-        next: (data: any) => {
-          this.typeDocuments = data.data;
-          this.initializeSelectInputs();
-        },
-        error: (error) => {
-          console.error('Error loading document types:', error);
-          M.toast({ html: 'Error al cargar tipos de documento', classes: 'red' });
-        }
-      });
-      this.subscriptions.push(sub);
-    }
+  loadTypeDocuments(): void {
+    const observable = this.typeDocumentService.getTypeDocuments();
+    const sub = observable.subscribe({
+      next: (data: TypeDocument[]) => {
+        this.typeDocuments = data;
+        this.initializeSelectInputs();
+      },
+      error: (error) => {
+        console.error('Error loading document types:', error);
+        M.toast({ html: 'Error al cargar tipos de documento', classes: 'red' });
+      }
+    });
+    this.subscriptions.push(sub);
   }
 
   initializeSelectInputs(): void {
@@ -133,23 +127,21 @@ export class AdmonComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-  async saveUserChanges(): Promise<void> {
+  saveUserChanges(): void {
     if (this.selectedUser) {
-      const observable = await this.userService.putUser(this.selectedUser.id_user, this.selectedUser);
-      if (observable) {
-        const sub = observable.subscribe({
-          next: (updatedUser) => {
-            M.toast({ html: 'Usuario actualizado correctamente', classes: 'green' });
-            this.loadUsers();
-            this.cancelEdit();
-          },
-          error: (error) => {
-            console.error('Error updating user:', error);
-            M.toast({ html: 'Error al actualizar usuario', classes: 'red' });
-          }
-        });
-        this.subscriptions.push(sub);
-      }
+      const observable = this.userService.putUser(this.selectedUser.id_user, this.selectedUser);
+      const sub = observable.subscribe({
+        next: (updatedUser) => {
+          M.toast({ html: 'Usuario actualizado correctamente', classes: 'green' });
+          this.loadUsers();
+          this.cancelEdit();
+        },
+        error: (error) => {
+          console.error('Error updating user:', error);
+          M.toast({ html: 'Error al actualizar usuario', classes: 'red' });
+        }
+      });
+      this.subscriptions.push(sub);
     }
   }
 
@@ -164,41 +156,37 @@ export class AdmonComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-  async createNewUser(): Promise<void> {
-    const observable = await this.userService.postUser(this.newUser);
-    if (observable) {
+  createNewUser(): void {
+    const observable = this.userService.postUser(this.newUser);
+    const sub = observable.subscribe({
+      next: (createdUser) => {
+        M.toast({ html: 'Usuario creado correctamente', classes: 'green' });
+        this.loadUsers();
+        this.cancelAdd();
+      },
+      error: (error) => {
+        console.error('Error creating user:', error);
+        M.toast({ html: 'Error al crear usuario', classes: 'red' });
+      }
+    });
+    this.subscriptions.push(sub);
+  }
+
+  deleteUser(id_user: string): void {
+    if (confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
+      const observable = this.userService.deleteUser(id_user);
       const sub = observable.subscribe({
-        next: (createdUser) => {
-          M.toast({ html: 'Usuario creado correctamente', classes: 'green' });
+        next: () => {
+          M.toast({ html: 'Usuario eliminado correctamente', classes: 'green' });
           this.loadUsers();
-          this.cancelAdd();
+          this.selectedUser = null; // Clear selection after deletion
         },
         error: (error) => {
-          console.error('Error creating user:', error);
-          M.toast({ html: 'Error al crear usuario', classes: 'red' });
+          console.error('Error deleting user:', error);
+          M.toast({ html: 'Error al eliminar usuario', classes: 'red' });
         }
       });
       this.subscriptions.push(sub);
-    }
-  }
-
-  async deleteUser(id_user: string): Promise<void> {
-    if (confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
-      const observable = await this.userService.deleteUser(id_user);
-      if (observable) {
-        const sub = observable.subscribe({
-          next: () => {
-            M.toast({ html: 'Usuario eliminado correctamente', classes: 'green' });
-            this.loadUsers();
-            this.selectedUser = null; // Clear selection after deletion
-          },
-          error: (error) => {
-            console.error('Error deleting user:', error);
-            M.toast({ html: 'Error al eliminar usuario', classes: 'red' });
-          }
-        });
-        this.subscriptions.push(sub);
-      }
     }
   }
 

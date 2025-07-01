@@ -34,11 +34,6 @@
                             (click)="openCategoryModal(category); $event.stopPropagation()">
                       <i class="material-icons">edit</i>
                     </button>
-                    <button class="btn-floating btn-small waves-effect waves-light red ml-5 tooltipped"
-                            data-position="top" data-tooltip="Eliminar Categoría"
-                            (click)="deleteCategory(category.id_category); $event.stopPropagation()">
-                      <i class="material-icons">delete</i>
-                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -78,11 +73,6 @@
                               data-position="top" data-tooltip="Editar Subcategoría"
                               (click)="openSubcategoryModal(subcategory)">
                         <i class="material-icons">edit</i>
-                      </button>
-                      <button class="btn-floating btn-small waves-effect waves-light red ml-5 tooltipped"
-                              data-position="top" data-tooltip="Eliminar Subcategoría"
-                              (click)="deleteSubcategory(subcategory.id_subcategory)">
-                        <i class="material-icons">delete</i>
                       </button>
                     </td>
                   </tr>

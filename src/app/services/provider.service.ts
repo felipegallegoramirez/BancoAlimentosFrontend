@@ -24,7 +24,7 @@ export class ProviderService {
     const id_user = localStorage.getItem('id');
     const perms = await this.permsService.getPerms(id_user, 'create_provider');
     if (perms) {
-      return this.http.post<Provider>(this.URL_API, Provider,this.httpOptions);
+      return this.http.post<Provider>(this.URL_API, Provider,this.httpOptions).toPromise();
     } else {
       return null;
     }
@@ -34,7 +34,7 @@ export class ProviderService {
     const id_user = localStorage.getItem('id');
     const perms = await this.permsService.getPerms(id_user, 'read_provider');
     if (perms) {
-      return this.http.get<Provider[]>(this.URL_API+``,this.httpOptions);
+      return this.http.get<Provider[]>(this.URL_API+``,this.httpOptions).toPromise();
     } else {
       return null;
     }
@@ -45,7 +45,7 @@ export class ProviderService {
     const id_user = localStorage.getItem('id');
     const perms = await this.permsService.getPerms(id_user, 'read_provider');
     if (perms) {
-      return this.http.get<Provider>(this.URL_API+`/${id}`,this.httpOptions);
+      return this.http.get<Provider>(this.URL_API+`/${id}`,this.httpOptions).toPromise();
     } else {
       return null;
     }
@@ -55,7 +55,7 @@ export class ProviderService {
     const id_user = localStorage.getItem('id');
     const perms = await this.permsService.getPerms(id_user, 'edit_provider');
     if (perms) {
-      return this.http.put<Provider>(this.URL_API+`/${id}`,Provider,this.httpOptions);
+      return this.http.put<Provider>(this.URL_API+`/${id}`,Provider,this.httpOptions).toPromise();
     } else {
       return null;
     }
@@ -65,7 +65,7 @@ export class ProviderService {
     const id_user = localStorage.getItem('id');
     const perms = await this.permsService.getPerms(id_user, 'delete_provider');
     if (perms) {
-      return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
+      return this.http.delete(this.URL_API+`/${id}`,this.httpOptions).toPromise();
     } else {
       return null;
     }

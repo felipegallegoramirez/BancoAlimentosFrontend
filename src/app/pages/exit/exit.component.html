@@ -55,7 +55,21 @@
               Cantidad requerida y debe ser al menos 1
             </span>
           </div>
-          <div class="col s12 m6 right-align">
+          <div class="input-field col s12 m6">
+            <select id="beneficiary-select" formControlName="beneficiaryId" class="validate" required (change)="onBeneficiaryChange($event)">
+              <option value="" disabled selected>Seleccione un beneficiario ({{ beneficiaries.length }} disponibles)</option>
+              <option *ngFor="let beneficiary of beneficiaries; let i = index" [value]="beneficiary.id_beneficiary">
+                {{ i + 1 }}. {{ beneficiary.legal_name }} (ID: {{ beneficiary.id_beneficiary }})
+              </option>
+            </select>
+            <label for="beneficiary-select">Beneficiario *</label>
+            <span class="helper-text red-text" *ngIf="exitForm.get('beneficiaryId')?.invalid && exitForm.get('beneficiaryId')?.touched">
+              Debe seleccionar un beneficiario
+            </span>
+            <small class="helper-text">Beneficiarios cargados: {{ beneficiaries.length }}</small>
+            <small class="helper-text blue-text">Valor seleccionado: {{ exitForm.get('beneficiaryId')?.value || 'Ninguno' }}</small>
+          </div>
+          <div class="col s12 right-align">
             <button class="btn waves-effect waves-light red darken-1" type="submit" name="action">
               Registrar Salida <i class="material-icons right">remove_shopping_cart</i>
             </button>
