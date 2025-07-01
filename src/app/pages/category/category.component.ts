@@ -83,25 +83,28 @@ export class CategoryComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  loadCategories(): void {
-    this.categoryService.getCategorys().subscribe({
-      next: (data: Category[]) => {
-        this.categories = data;
-        if (this.selectedCategory) {
-          const reselected = this.categories.find(c => c.id_category === this.selectedCategory?.id_category);
-          if (reselected) {
-            this.selectCategory(reselected);
-          } else {
-            this.selectedCategory = null;
-            this.subcategories = [];
+  async loadCategories(): Promise<void> {
+    const observable = await this.categoryService.getCategorys();
+    if (observable) {
+      observable.subscribe({
+        next: (data: Category[]) => {
+          this.categories = data;
+          if (this.selectedCategory) {
+            const reselected = this.categories.find(c => c.id_category === this.selectedCategory?.id_category);
+            if (reselected) {
+              this.selectCategory(reselected);
+            } else {
+              this.selectedCategory = null;
+              this.subcategories = [];
+            }
           }
+        },
+        error: (err) => {
+          M.toast({ html: 'Error al cargar categorías', classes: 'red darken-2' });
+          console.error(err);
         }
-      },
-      error: (err) => {
-        M.toast({ html: 'Error al cargar categorías', classes: 'red darken-2' });
-        console.error(err);
-      }
-    });
+      });
+    }
   }
 
   selectCategory(category: Category): void {
@@ -109,16 +112,19 @@ export class CategoryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadSubcategories(category.id_category);
   }
 
-  loadSubcategories(categoryId: string): void {
-    this.subcategoryService.getSubcategorys().subscribe({
-      next: (data: Subcategory[]) => {
-        this.subcategories = data.filter(sub => sub.id_category === categoryId);
-      },
-      error: (err) => {
-        M.toast({ html: 'Error al cargar subcategorías', classes: 'red darken-2' });
-        console.error(err);
-      }
-    });
+  async loadSubcategories(categoryId: string): Promise<void> {
+    const observable = await this.subcategoryService.getSubcategorys();
+    if (observable) {
+      observable.subscribe({
+        next: (data: Subcategory[]) => {
+          this.subcategories = data.filter(sub => sub.id_category === categoryId);
+        },
+        error: (err) => {
+          M.toast({ html: 'Error al cargar subcategorías', classes: 'red darken-2' });
+          console.error(err);
+        }
+      });
+    }
   }
 
   openCategoryModal(category?: Category): void {
@@ -131,7 +137,7 @@ export class CategoryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.categoryModalInstance?.open();
   }
 
-  saveCategory(): void {
+  async saveCategory(): Promise<void> {
     if (this.categoryForm.invalid) {
       M.toast({ html: 'Por favor, completa todos los campos requeridos para la categoría.', classes: 'orange darken-2' });
       return;
@@ -140,49 +146,58 @@ export class CategoryComponent implements OnInit, AfterViewInit, OnDestroy {
     const categoryData: Category = this.categoryForm.value;
 
     if (this.isEditCategoryMode) {
-      this.categoryService.putCategory(categoryData.id_category, categoryData).subscribe({
-        next: () => {
-          M.toast({ html: 'Categoría actualizada correctamente', classes: 'green darken-2' });
-          this.loadCategories();
-          this.categoryModalInstance?.close();
-        },
-        error: (err) => {
-          M.toast({ html: 'Error al actualizar categoría', classes: 'red darken-2' });
-          console.error(err);
-        }
-      });
+      const observable = await this.categoryService.putCategory(categoryData.id_category, categoryData);
+      if (observable) {
+        observable.subscribe({
+          next: () => {
+            M.toast({ html: 'Categoría actualizada correctamente', classes: 'green darken-2' });
+            this.loadCategories();
+            this.categoryModalInstance?.close();
+          },
+          error: (err) => {
+            M.toast({ html: 'Error al actualizar categoría', classes: 'red darken-2' });
+            console.error(err);
+          }
+        });
+      }
     } else {
       const { id_category, ...newCategoryData } = categoryData;
-      this.categoryService.postCategory(newCategoryData as Omit<Category, 'id_category'>).subscribe({
-        next: () => {
-          M.toast({ html: 'Categoría creada correctamente', classes: 'green darken-2' });
-          this.loadCategories();
-          this.categoryModalInstance?.close();
-        },
-        error: (err) => {
-          M.toast({ html: 'Error al crear categoría', classes: 'red darken-2' });
-          console.error(err);
-        }
-      });
+      const observable = await this.categoryService.postCategory(newCategoryData as Omit<Category, 'id_category'>);
+      if (observable) {
+        observable.subscribe({
+          next: () => {
+            M.toast({ html: 'Categoría creada correctamente', classes: 'green darken-2' });
+            this.loadCategories();
+            this.categoryModalInstance?.close();
+          },
+          error: (err) => {
+            M.toast({ html: 'Error al crear categoría', classes: 'red darken-2' });
+            console.error(err);
+          }
+        });
+      }
     }
   }
 
-  deleteCategory(id: string): void {
+  async deleteCategory(id: string): Promise<void> {
     if (confirm('¿Estás seguro de que quieres eliminar esta categoría? Esto también eliminará sus subcategorías asociadas.')) {
-      this.categoryService.deleteCategory(id).subscribe({
-        next: () => {
-          M.toast({ html: 'Categoría eliminada correctamente', classes: 'green darken-2' });
-          this.loadCategories();
-          if (this.selectedCategory?.id_category === id) {
-            this.selectedCategory = null;
-            this.subcategories = [];
+      const observable = await this.categoryService.deleteCategory(id);
+      if (observable) {
+        observable.subscribe({
+          next: () => {
+            M.toast({ html: 'Categoría eliminada correctamente', classes: 'green darken-2' });
+            this.loadCategories();
+            if (this.selectedCategory?.id_category === id) {
+              this.selectedCategory = null;
+              this.subcategories = [];
+            }
+          },
+          error: (err) => {
+            M.toast({ html: 'Error al eliminar categoría', classes: 'red darken-2' });
+            console.error(err);
           }
-        },
-        error: (err) => {
-          M.toast({ html: 'Error al eliminar categoría', classes: 'red darken-2' });
-          console.error(err);
-        }
-      });
+        });
+      }
     }
   }
 
@@ -201,7 +216,7 @@ export class CategoryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subcategoryModalInstance?.open();
   }
 
-  saveSubcategory(): void {
+  async saveSubcategory(): Promise<void> {
     if (this.subcategoryForm.invalid) {
       M.toast({ html: 'Por favor, completa todos los campos requeridos para la subcategoría.', classes: 'orange darken-2' });
       return;
@@ -213,51 +228,60 @@ export class CategoryComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (this.isEditSubcategoryMode) {
-      this.subcategoryService.putSubcategory(subcategoryData.id_subcategory, subcategoryData).subscribe({
-        next: () => {
-          M.toast({ html: 'Subcategoría actualizada correctamente', classes: 'green darken-2' });
-          if (this.selectedCategory) {
-            this.loadSubcategories(this.selectedCategory.id_category);
+      const observable = await this.subcategoryService.putSubcategory(subcategoryData.id_subcategory, subcategoryData);
+      if (observable) {
+        observable.subscribe({
+          next: () => {
+            M.toast({ html: 'Subcategoría actualizada correctamente', classes: 'green darken-2' });
+            if (this.selectedCategory) {
+              this.loadSubcategories(this.selectedCategory.id_category);
+            }
+            this.subcategoryModalInstance?.close();
+          },
+          error: (err) => {
+            M.toast({ html: 'Error al actualizar subcategoría', classes: 'red darken-2' });
+            console.error(err);
           }
-          this.subcategoryModalInstance?.close();
-        },
-        error: (err) => {
-          M.toast({ html: 'Error al actualizar subcategoría', classes: 'red darken-2' });
-          console.error(err);
-        }
-      });
+        });
+      }
     } else {
       const { id_subcategory, ...newSubcategoryData } = subcategoryData;
-      this.subcategoryService.postSubcategory(newSubcategoryData as Omit<Subcategory, 'id_subcategory'>).subscribe({
-        next: () => {
-          M.toast({ html: 'Subcategoría creada correctamente', classes: 'green darken-2' });
-          if (this.selectedCategory) {
-            this.loadSubcategories(this.selectedCategory.id_category);
+      const observable = await this.subcategoryService.postSubcategory(newSubcategoryData as Omit<Subcategory, 'id_subcategory'>);
+      if (observable) {
+        observable.subscribe({
+          next: () => {
+            M.toast({ html: 'Subcategoría creada correctamente', classes: 'green darken-2' });
+            if (this.selectedCategory) {
+              this.loadSubcategories(this.selectedCategory.id_category);
+            }
+            this.subcategoryModalInstance?.close();
+          },
+          error: (err) => {
+            M.toast({ html: 'Error al crear subcategoría', classes: 'red darken-2' });
+            console.error(err);
           }
-          this.subcategoryModalInstance?.close();
-        },
-        error: (err) => {
-          M.toast({ html: 'Error al crear subcategoría', classes: 'red darken-2' });
-          console.error(err);
-        }
-      });
+        });
+      }
     }
   }
 
-  deleteSubcategory(id: string): void {
+  async deleteSubcategory(id: string): Promise<void> {
     if (confirm('¿Estás seguro de que quieres eliminar esta subcategoría?')) {
-      this.subcategoryService.deleteSubcategory(id).subscribe({
-        next: () => {
-          M.toast({ html: 'Subcategoría eliminada correctamente', classes: 'green darken-2' });
-          if (this.selectedCategory) {
-            this.loadSubcategories(this.selectedCategory.id_category);
+      const observable = await this.subcategoryService.deleteSubcategory(id);
+      if (observable) {
+        observable.subscribe({
+          next: () => {
+            M.toast({ html: 'Subcategoría eliminada correctamente', classes: 'green darken-2' });
+            if (this.selectedCategory) {
+              this.loadSubcategories(this.selectedCategory.id_category);
+            }
+          },
+          error: (err) => {
+            M.toast({ html: 'Error al eliminar subcategoría', classes: 'red darken-2' });
+            console.error(err);
           }
-        },
-        error: (err) => {
-          M.toast({ html: 'Error al eliminar subcategoría', classes: 'red darken-2' });
-          console.error(err);
-        }
-      });
+        });
+      }
     }
   }
 }

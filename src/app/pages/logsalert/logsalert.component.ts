@@ -71,7 +71,7 @@ export class LogsalertComponent implements OnInit {
   }
 
   loadLogsAlerts(): void {
-    this.logsAlertService.getLogsAlerts().subscribe(
+    this.logsAlertService.getLogsAlerts().then(
       (data: any) => {
         console.log(data);
         this.logsAlerts = data;

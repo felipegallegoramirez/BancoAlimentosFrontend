@@ -8,8 +8,7 @@
   <li class="logo center-align" style="padding: 20px 0;">
     <img src="assets/logo.jpg" alt="Logo" class="responsive-img" style="max-height: 200px;">
   </li>
-  <li><a href="/home" class="waves-effect"><i class="material-icons">home</i>Inicio</a></li>
-  <li><a href="/login" class="waves-effect"><i class="material-icons">build</i>Ingreso</a></li>
+
   <li><a href="/admon" class="waves-effect"><i class="material-icons">contacts</i>Administrador</a></li>
   <li><a href="/inventory" class="waves-effect"><i class="material-icons">contacts</i>Inventario</a></li>
   <li><a href="/entry" class="waves-effect"><i class="material-icons">contacts</i>Entrada</a></li>
@@ -19,6 +18,7 @@
   <li><a href="/category" class="waves-effect"><i class="material-icons">contacts</i>Categorías</a></li>
   <li><a href="/role" class="waves-effect"><i class="material-icons">contacts</i>Roles</a></li>
   <li><a href="/logsalert" class="waves-effect"><i class="material-icons">contacts</i>Logs de Alertas</a></li>
+  <li><a (click)="logout()" class="waves-effect"><i class="material-icons">build</i>Cerrar Sesión</a></li>
 </ul>
 
 <router-outlet></router-outlet>

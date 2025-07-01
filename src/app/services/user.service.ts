@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient,HttpHeaders  } from "@angular/common/http";
 import { User } from "../models/user.model";
+import { PermsService } from "./perms.service";
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import { User } from "../models/user.model";
 export class UserService {
   readonly URL_API = "http://localhost:3000/api/user";
   token = localStorage.getItem('token');
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private permsService: PermsService) {
   }
 
   
@@ -19,25 +20,55 @@ export class UserService {
   };
 
 
-  postUser(User: User) {
-    return this.http.post<User>(this.URL_API, User,this.httpOptions);
+  async postUser(User: User) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'create_user');
+    if (perms) {
+      return this.http.post<User>(this.URL_API, User,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
-  getUsers() {
-    return this.http.get<User[]>(this.URL_API+``,this.httpOptions);
+  async getUsers() {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'read_user');
+    if (perms) {
+      return this.http.get<User[]>(this.URL_API+``,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
 
-  getUser(id:string) {
-    return this.http.get<User>(this.URL_API+`/${id}`,this.httpOptions);
+  async getUser(id:string) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'read_user');
+    if (perms) {
+      return this.http.get<User>(this.URL_API+`/${id}`,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
-  putUser(id:string, User: User) {
-    return this.http.put<User>(this.URL_API+`/${id}`,User,this.httpOptions);
+  async putUser(id:string, User: User) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'edit_user');
+    if (perms) {
+      return this.http.put<User>(this.URL_API+`/${id}`,User,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
-  deleteUser(id: string) {
-    return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
+  async deleteUser(id: string) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'delete_user');
+    if (perms) {
+      return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
   login(email:string, password:string ) {

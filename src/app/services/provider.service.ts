@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient,HttpHeaders  } from "@angular/common/http";
 import { Provider } from "../models/provider.model";
+import { PermsService } from "./perms.service";
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import { Provider } from "../models/provider.model";
 export class ProviderService {
   readonly URL_API = "http://localhost:3000/api/provider";
   token = localStorage.getItem('token');
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private permsService: PermsService) {
   }
 
   
@@ -19,24 +20,54 @@ export class ProviderService {
   };
 
 
-  postProvider(Provider: Provider) {
-    return this.http.post<Provider>(this.URL_API, Provider,this.httpOptions);
+  async postProvider(Provider: Provider) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'create_provider');
+    if (perms) {
+      return this.http.post<Provider>(this.URL_API, Provider,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
-  getProviders() {
-    return this.http.get<Provider[]>(this.URL_API+``,this.httpOptions);
+  async getProviders() {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'read_provider');
+    if (perms) {
+      return this.http.get<Provider[]>(this.URL_API+``,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
 
-  getProvider(id:string) {
-    return this.http.get<Provider>(this.URL_API+`/${id}`,this.httpOptions);
+  async getProvider(id:string) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'read_provider');
+    if (perms) {
+      return this.http.get<Provider>(this.URL_API+`/${id}`,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
-  putProvider(id:string, Provider: Provider) {
-    return this.http.put<Provider>(this.URL_API+`/${id}`,Provider,this.httpOptions);
+  async putProvider(id:string, Provider: Provider) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'edit_provider');
+    if (perms) {
+      return this.http.put<Provider>(this.URL_API+`/${id}`,Provider,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
-  deleteProvider(id: string) {
-    return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
+  async deleteProvider(id: string) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'delete_provider');
+    if (perms) {
+      return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 }

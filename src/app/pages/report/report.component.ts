@@ -138,16 +138,18 @@ export class ReportComponent implements OnInit, OnDestroy {
    */
   public getReports(): void {
     this.reportService.getReports()
-      .pipe(takeUntil(this.destroy$)) // Desuscribe automáticamente cuando el componente se destruye
-      .subscribe({
-        next: (data: Report[]) => {
-          this.reports = data;
-          this.applyFilters(); // Aplica los filtros iniciales después de cargar los datos
-        },
-        error: (err) => {
-          console.error('Error al obtener reportes:', err);
-          M.toast({ html: 'Error al cargar los reportes', classes: 'red' });
-        }
+      .then((observable) => {
+        observable.pipe(takeUntil(this.destroy$)) // Desuscribe automáticamente cuando el componente se destruye
+          .subscribe({
+            next: (data: Report[]) => {
+              this.reports = data;
+              this.applyFilters(); // Aplica los filtros iniciales después de cargar los datos
+            },
+            error: (err) => {
+              console.error('Error al obtener reportes:', err);
+              M.toast({ html: 'Error al cargar los reportes', classes: 'red' });
+            }
+          });
       });
   }
 
@@ -221,32 +223,36 @@ export class ReportComponent implements OnInit, OnDestroy {
     if (this.selectedReport && this.selectedReport.id_report) {
       // Si hay un reporte seleccionado y tiene un ID, es una actualización (PUT)
       this.reportService.putReport(this.selectedReport.id_report, reportData)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (updatedReport) => {
-            M.toast({ html: 'Reporte actualizado con éxito!', classes: 'green' });
-            this.getReports(); // Recarga la lista de reportes para mostrar el cambio
-            this.addEditModalInstance?.close(); // Cierra el modal
-          },
-          error: (err) => {
-            console.error('Error al actualizar reporte:', err);
-            M.toast({ html: 'Error al actualizar el reporte', classes: 'red' });
-          }
+        .then((observable) => {
+          observable.pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (updatedReport) => {
+                M.toast({ html: 'Reporte actualizado con éxito!', classes: 'green' });
+                this.getReports(); // Recarga la lista de reportes para mostrar el cambio
+                this.addEditModalInstance?.close(); // Cierra el modal
+              },
+              error: (err) => {
+                console.error('Error al actualizar reporte:', err);
+                M.toast({ html: 'Error al actualizar el reporte', classes: 'red' });
+              }
+            });
         });
     } else {
       // Si no hay reporte seleccionado o no tiene ID, es una creación (POST)
       this.reportService.postReport(reportData)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (newReport) => {
-            M.toast({ html: 'Reporte creado con éxito!', classes: 'green' });
-            this.getReports(); // Recarga la lista de reportes
-            this.addEditModalInstance?.close(); // Cierra el modal
-          },
-          error: (err) => {
-            console.error('Error al crear reporte:', err);
-            M.toast({ html: 'Error al crear el reporte', classes: 'red' });
-          }
+        .then((observable) => {
+          observable.pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (newReport) => {
+                M.toast({ html: 'Reporte creado con éxito!', classes: 'green' });
+                this.getReports(); // Recarga la lista de reportes
+                this.addEditModalInstance?.close(); // Cierra el modal
+              },
+              error: (err) => {
+                console.error('Error al crear reporte:', err);
+                M.toast({ html: 'Error al crear el reporte', classes: 'red' });
+              }
+            });
         });
     }
   }
@@ -259,16 +265,18 @@ export class ReportComponent implements OnInit, OnDestroy {
   public deleteReport(id_report: string): void {
     if (confirm('¿Estás seguro de que quieres eliminar este reporte?')) {
       this.reportService.deleteReport(id_report)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            M.toast({ html: 'Reporte eliminado con éxito!', classes: 'green' });
-            this.getReports(); // Recarga la lista de reportes
-          },
-          error: (err) => {
-            console.error('Error al eliminar reporte:', err);
-            M.toast({ html: 'Error al eliminar el reporte', classes: 'red' });
-          }
+        .then((observable) => {
+          observable.pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: () => {
+                M.toast({ html: 'Reporte eliminado con éxito!', classes: 'green' });
+                this.getReports(); // Recarga la lista de reportes
+              },
+              error: (err) => {
+                console.error('Error al eliminar reporte:', err);
+                M.toast({ html: 'Error al eliminar el reporte', classes: 'red' });
+              }
+            });
         });
     }
   }

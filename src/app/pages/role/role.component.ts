@@ -29,8 +29,8 @@ export class RoleComponent implements OnInit {
   }
 
   getRoles(): void {
-    this.roleService.getRoles().subscribe(
-      (data: Role[]) => {
+    this.roleService.getRoles().then(
+      (data: any) => {
         this.roles = data;
       },
       error => {
@@ -77,54 +77,63 @@ export class RoleComponent implements OnInit {
     this.selectedRole = null; // Clear selected role when editing
   }
 
-  saveRole(): void {
+  async saveRole(): Promise<void> {
     if (this.newRole) {
       if (this.isEditing) {
-        this.roleService.putRole(this.newRole.id_role, this.newRole).subscribe(
-          (updatedRole: Role) => {
-            const index = this.roles.findIndex(r => r.id_role === updatedRole.id_role);
-            if (index > -1) {
-              this.roles[index] = updatedRole;
+        const observable = await this.roleService.putRole(this.newRole.id_role, this.newRole);
+        if (observable) {
+          observable.subscribe(
+            (updatedRole: Role) => {
+              const index = this.roles.findIndex(r => r.id_role === updatedRole.id_role);
+              if (index > -1) {
+                this.roles[index] = updatedRole;
+              }
+              this.cancel();
+              M.toast({ html: 'Rol actualizado exitosamente!' });
+            },
+            error => {
+              console.error('Error updating role:', error);
+              M.toast({ html: 'Error al actualizar el rol.', classes: 'red' });
             }
-            this.cancel();
-            M.toast({ html: 'Rol actualizado exitosamente!' });
-          },
-          error => {
-            console.error('Error updating role:', error);
-            M.toast({ html: 'Error al actualizar el rol.', classes: 'red' });
-          }
-        );
+          );
+        }
       } else {
         this.newRole.created_at = new Date();
         this.newRole.updated_at = new Date();
-        this.roleService.postRole(this.newRole).subscribe(
-          (createdRole: Role) => {
-            this.roles.push(createdRole);
-            this.cancel();
-            M.toast({ html: 'Rol creado exitosamente!' });
-          },
-          error => {
-            console.error('Error creating role:', error);
-            M.toast({ html: 'Error al crear el rol.', classes: 'red' });
-          }
-        );
+        const observable = await this.roleService.postRole(this.newRole);
+        if (observable) {
+          observable.subscribe(
+            (createdRole: Role) => {
+              this.roles.push(createdRole);
+              this.cancel();
+              M.toast({ html: 'Rol creado exitosamente!' });
+            },
+            error => {
+              console.error('Error creating role:', error);
+              M.toast({ html: 'Error al crear el rol.', classes: 'red' });
+            }
+          );
+        }
       }
     }
   }
 
-  deleteRole(id: string): void {
+  async deleteRole(id: string): Promise<void> {
     if (confirm('¿Estás seguro de que quieres eliminar este rol?')) {
-      this.roleService.deleteRole(id).subscribe(
-        () => {
-          this.roles = this.roles.filter(r => r.id_role !== id);
-          this.cancel();
-          M.toast({ html: 'Rol eliminado exitosamente!' });
-        },
-        error => {
-          console.error('Error deleting role:', error);
-          M.toast({ html: 'Error al eliminar el rol.', classes: 'red' });
-        }
-      );
+      const observable = await this.roleService.deleteRole(id);
+      if (observable) {
+        observable.subscribe(
+          () => {
+            this.roles = this.roles.filter(r => r.id_role !== id);
+            this.cancel();
+            M.toast({ html: 'Rol eliminado exitosamente!' });
+          },
+          error => {
+            console.error('Error deleting role:', error);
+            M.toast({ html: 'Error al eliminar el rol.', classes: 'red' });
+          }
+        );
+      }
     }
   }
 

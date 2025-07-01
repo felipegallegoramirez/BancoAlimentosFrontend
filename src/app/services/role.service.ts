@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient,HttpHeaders  } from "@angular/common/http";
 import { Role } from "../models/role.model";
+import { PermsService } from "./perms.service";
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import { Role } from "../models/role.model";
 export class RoleService {
   readonly URL_API = "http://localhost:3000/api/role";
   token = localStorage.getItem('token');
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private permsService: PermsService) {
   }
 
   
@@ -18,25 +19,59 @@ export class RoleService {
     })
   };
 
-
-  postRole(Role: Role) {
+  async postRole(Role: Role) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'create_role');
+    if (perms) {
+      return this.http.post<Role>(this.URL_API, Role,this.httpOptions);
+    } else {
+      return null;
+    }
     return this.http.post<Role>(this.URL_API, Role,this.httpOptions);
   }
 
-  getRoles() {
+  async getRoles() {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'read_role');
+    if (perms) {
+      return this.http.get<Role[]>(this.URL_API+``,this.httpOptions);
+    } else {
+      return null;
+    }
     return this.http.get<Role[]>(this.URL_API+``,this.httpOptions);
   }
 
 
-  getRole(id:string) {
+  async getRole(id:string) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'read_role');
+    if (perms) {
+      return this.http.get<Role>(this.URL_API+`/${id}`,this.httpOptions);
+    } else {
+      return null;
+    }
     return this.http.get<Role>(this.URL_API+`/${id}`,this.httpOptions);
   }
 
-  putRole(id:string, Role: Role) {
+  async putRole(id:string, Role: Role) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'edit_role');
+    if (perms) {
+      return this.http.put<Role>(this.URL_API+`/${id}`,Role,this.httpOptions);
+    } else {
+      return null;
+    }
     return this.http.put<Role>(this.URL_API+`/${id}`,Role,this.httpOptions);
   }
 
-  deleteRole(id: string) {
+  async deleteRole(id: string) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'delete_role');
+    if (perms) {
+      return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
+    } else {
+      return null;
+    }
     return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
   }
 

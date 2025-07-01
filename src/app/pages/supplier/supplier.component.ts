@@ -55,8 +55,8 @@ export class SupplierComponent implements OnInit, AfterViewInit {
   }
 
   loadProviders(): void {
-    this.providerService.getProviders().subscribe(
-      (data: Provider[]) => {
+    this.providerService.getProviders().then(
+      (data: any) => {
         this.providers = data;
         this.applyFilter(); // Apply filter initially to populate filteredProviders
       },
@@ -68,7 +68,7 @@ export class SupplierComponent implements OnInit, AfterViewInit {
   }
 
   loadTypeDocuments(): void {
-    this.typeDocumentService.getTypeDocuments().subscribe(
+    this.typeDocumentService.getTypeDocuments().then(
       (data: any) => {
         
         this.typeDocuments = data.data;
@@ -116,7 +116,7 @@ export class SupplierComponent implements OnInit, AfterViewInit {
 
   saveProvider(): void {
     if (this.isAdding) {
-      this.providerService.postProvider(this.currentProvider).subscribe(
+      this.providerService.postProvider(this.currentProvider).then(
         () => {
           M.toast({ html: 'Proveedor agregado exitosamente', classes: 'green darken-2' });
           this.loadProviders();
@@ -128,7 +128,7 @@ export class SupplierComponent implements OnInit, AfterViewInit {
         }
       );
     } else if (this.isEditing && this.currentProvider.id_providers) {
-      this.providerService.putProvider(this.currentProvider.id_providers, this.currentProvider).subscribe(
+      this.providerService.putProvider(this.currentProvider.id_providers, this.currentProvider).then(
         () => {
           M.toast({ html: 'Proveedor actualizado exitosamente', classes: 'green darken-2' });
           this.loadProviders();
@@ -144,7 +144,7 @@ export class SupplierComponent implements OnInit, AfterViewInit {
 
   deleteProvider(id: string): void {
     if (confirm('¿Estás seguro de que quieres eliminar este proveedor?')) {
-      this.providerService.deleteProvider(id).subscribe(
+      this.providerService.deleteProvider(id).then(
         () => {
           M.toast({ html: 'Proveedor eliminado exitosamente', classes: 'green darken-2' });
           this.loadProviders();

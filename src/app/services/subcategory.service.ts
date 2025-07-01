@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient,HttpHeaders  } from "@angular/common/http";
 import { Subcategory } from "../models/subcategory.model";
+import { PermsService } from "./perms.service";
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import { Subcategory } from "../models/subcategory.model";
 export class SubcategoryService {
   readonly URL_API = "http://localhost:3000/api/subcategory";
   token = localStorage.getItem('token');
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private permsService: PermsService) {
   }
 
   
@@ -19,24 +20,54 @@ export class SubcategoryService {
   };
 
 
-  postSubcategory(Subcategory: Subcategory) {
-    return this.http.post<Subcategory>(this.URL_API, Subcategory,this.httpOptions);
+  async postSubcategory(Subcategory: Subcategory) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'create_subcategory');
+    if (perms) {
+      return this.http.post<Subcategory>(this.URL_API, Subcategory,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
-  getSubcategorys() {
-    return this.http.get<Subcategory[]>(this.URL_API+``,this.httpOptions);
+  async getSubcategorys() {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'read_subcategory');
+    if (perms) {
+      return this.http.get<Subcategory[]>(this.URL_API+``,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
 
-  getSubcategory(id:string) {
-    return this.http.get<Subcategory>(this.URL_API+`/${id}`,this.httpOptions);
+  async getSubcategory(id:string) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'read_subcategory');
+    if (perms) {
+      return this.http.get<Subcategory>(this.URL_API+`/${id}`,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
-  putSubcategory(id:string, Subcategory: Subcategory) {
-    return this.http.put<Subcategory>(this.URL_API+`/${id}`,Subcategory,this.httpOptions);
+  async putSubcategory(id:string, Subcategory: Subcategory) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'edit_subcategory');
+    if (perms) {
+      return this.http.put<Subcategory>(this.URL_API+`/${id}`,Subcategory,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
-  deleteSubcategory(id: string) {
-    return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
+  async deleteSubcategory(id: string) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'delete_subcategory');
+    if (perms) {
+      return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 }

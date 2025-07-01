@@ -14,19 +14,21 @@ import { CategoryComponent } from './pages/category/category.component';
 import { RoleComponent } from './pages/role/role.component';
 import { LogsalertComponent } from './pages/logsalert/logsalert.component';
 
+import { AuthGuard } from './guards/auth.guard';
+
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
-  { path: 'entry', component: EntryComponent },
-  { path: 'exit', component: ExitComponent },
-  { path: 'inventory', component: InventoryComponent },
-  { path: 'admon', component: AdmonComponent },
-  { path: 'home', component: HomeComponent },
-  { path: 'report', component: ReportComponent },
-  { path: 'supplier', component: SupplierComponent },
-  { path: 'category', component: CategoryComponent },
-  { path: 'role', component: RoleComponent },
-  { path: 'logsalert', component: LogsalertComponent },
+  { path: 'entry', component: EntryComponent, canActivate: [AuthGuard] },
+  { path: 'exit', component: ExitComponent, canActivate: [AuthGuard] },
+  { path: 'inventory', component: InventoryComponent, canActivate: [AuthGuard] },
+  { path: 'admon', component: AdmonComponent, canActivate: [AuthGuard] },
+  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
+  { path: 'report', component: ReportComponent, canActivate: [AuthGuard] },
+  { path: 'supplier', component: SupplierComponent, canActivate: [AuthGuard] },
+  { path: 'category', component: CategoryComponent, canActivate: [AuthGuard] },
+  { path: 'role', component: RoleComponent, canActivate: [AuthGuard] },
+  { path: 'logsalert', component: LogsalertComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: 'landing' }
 ];
 

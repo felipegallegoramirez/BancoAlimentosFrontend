@@ -56,8 +56,8 @@ export class ExitComponent implements OnInit {
   }
 
   loadAllProducts(): void {
-    this.productService.getProducts().subscribe(
-      (data: Product[]) => {
+    this.productService.getProducts().then(
+      (data: any) => {
         this.products = data;
       },
       (error) => {
@@ -68,8 +68,8 @@ export class ExitComponent implements OnInit {
   }
 
   loadCategories(): void {
-    this.categoryService.getCategorys().subscribe(
-      (data: Category[]) => {
+    this.categoryService.getCategorys().then(
+      (data: any) => {
         this.categories = data;
       },
       (error) => {
@@ -79,8 +79,8 @@ export class ExitComponent implements OnInit {
   }
 
   loadProviders(): void {
-    this.providerService.getProviders().subscribe(
-      (data: Provider[]) => {
+    this.providerService.getProviders().then(
+      (data: any) => {
         this.providers = data;
       },
       (error) => {
@@ -90,8 +90,8 @@ export class ExitComponent implements OnInit {
   }
 
   loadSubcategories(): void {
-    this.subcategoryService.getSubcategorys().subscribe(
-      (data: Subcategory[]) => {
+    this.subcategoryService.getSubcategorys().then(
+      (data: any) => {
         this.subcategories = data;
       },
       (error) => {
@@ -149,8 +149,8 @@ export class ExitComponent implements OnInit {
       updated_at: new Date() // Update timestamp
     };
 
-    this.productService.putProduct(updatedProduct.id_product || '', updatedProduct).subscribe(
-      (response) => {
+    this.productService.putProduct(updatedProduct.id_product || '', updatedProduct).then(
+      (response: any) => {
         M.toast({ html: `Salida de ${quantityToExit} unidades de "${updatedProduct.name}" exitosa.` });
         this.foundProduct = updatedProduct; // Update displayed product
         // Re-load all products to ensure updated data for new searches

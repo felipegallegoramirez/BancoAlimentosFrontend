@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient,HttpHeaders  } from "@angular/common/http";
 import { TypeDocument } from "../models/type_document.model";
+import { PermsService } from "./perms.service";
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import { TypeDocument } from "../models/type_document.model";
 export class TypeDocumentService {
   readonly URL_API = "http://localhost:3000/api/type_document";
   token = localStorage.getItem('token');
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private permsService: PermsService) {
   }
 
   
@@ -19,24 +20,54 @@ export class TypeDocumentService {
   };
 
 
-  postTypeDocument(TypeDocument: TypeDocument) {
-    return this.http.post<TypeDocument>(this.URL_API, TypeDocument,this.httpOptions);
+  async postTypeDocument(TypeDocument: TypeDocument) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'create_type_document');
+    if (perms) {
+      return this.http.post<TypeDocument>(this.URL_API, TypeDocument,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
-  getTypeDocuments() {
-    return this.http.get<TypeDocument[]>(this.URL_API+``,this.httpOptions);
+  async getTypeDocuments() {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'read_type_document');
+    if (perms) {
+      return this.http.get<TypeDocument[]>(this.URL_API+``,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
 
-  getTypeDocument(id:string) {
-    return this.http.get<TypeDocument>(this.URL_API+`/${id}`,this.httpOptions);
+  async getTypeDocument(id:string) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'read_type_document');
+    if (perms) {
+      return this.http.get<TypeDocument>(this.URL_API+`/${id}`,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
-  putTypeDocument(id:string, TypeDocument: TypeDocument) {
-    return this.http.put<TypeDocument>(this.URL_API+`/${id}`,TypeDocument,this.httpOptions);
+  async putTypeDocument(id:string, TypeDocument: TypeDocument) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'edit_type_document');
+    if (perms) {
+      return this.http.put<TypeDocument>(this.URL_API+`/${id}`,TypeDocument,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 
-  deleteTypeDocument(id: string) {
-    return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
+  async deleteTypeDocument(id: string) {
+    const id_user = localStorage.getItem('id');
+    const perms = await this.permsService.getPerms(id_user, 'delete_type_document');
+    if (perms) {
+      return this.http.delete(this.URL_API+`/${id}`,this.httpOptions);
+    } else {
+      return null;
+    }
   }
 }

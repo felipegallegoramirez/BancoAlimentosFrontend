@@ -18,6 +18,10 @@
             <input id="code" type="text" formControlName="code" class="validate">
             <label for="code">Código de Barras</label>
             <span class="helper-text red-text" *ngIf="entryForm.get('code')?.invalid && entryForm.get('code')?.touched">Requerido</span>
+            <button type="button" class="btn waves-effect waves-light" (click)="openBarcodeScanner()">
+              Escanear Código
+              <i class="material-icons right">camera_alt</i>
+            </button>
           </div>
         </div>
 
@@ -112,11 +116,6 @@
           </div>
         </div>
         <div class="row">
-          <!-- <div class="input-field col s12 m6">
-            <input id="id_state_product" type="text" formControlName="id_state_product" class="validate">
-            <label for="id_state_product">Estado del Producto</label>
-            <span class="helper-text red-text" *ngIf="entryForm.get('id_state_product')?.invalid && entryForm.get('id_state_product')?.touched">Requerido</span>
-          </div> -->
           <div class="input-field col s12 m6">
             <input id="unit_weight" type="text" formControlName="unit_weight" class="validate">
             <label for="unit_weight">Peso por Unidad</label>
@@ -136,3 +135,5 @@
     </form>
   </div>
 </div>
+
+<ngx-barcode-scanner [hidden]="!barcodeScanning" (valueChanges)="onCodeChange($event)"></ngx-barcode-scanner>

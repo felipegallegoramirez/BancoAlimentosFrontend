@@ -1,4 +1,5 @@
 import { AfterViewInit, Component } from '@angular/core';
+import { Router } from '@angular/router';
 declare var M: any;
 
 
@@ -8,8 +9,16 @@ declare var M: any;
   styleUrl: './app.component.css'
 })
 export class AppComponent implements AfterViewInit {
+
+  constructor(private router: Router) {}
+
   ngAfterViewInit(): void {
     const elems = document.querySelectorAll('.sidenav');
     M.Sidenav.init(elems);
+  }
+  
+  logout() {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
   }
 }
